@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-night-900 text-white antialiased;
+    /* 模拟移动端 App 宽度：桌面端居中显示一个手机宽度的容器 */
+    overscroll-behavior: none;
+  }
+
+  /* 隐藏滚动条但保留滚动能力 */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer components {
+  /* App 容器：移动优先，桌面端模拟手机宽度 */
+  .app-shell {
+    @apply mx-auto flex h-full w-full max-w-[480px] flex-col overflow-hidden bg-night-900;
+    box-shadow: 0 0 80px rgba(0, 0, 0, 0.5);
+  }
+
+  /* 通用按钮 */
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-brand-500 px-6 py-3 font-semibold text-white shadow-glow transition active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-full bg-white/10 px-6 py-3 font-semibold text-white transition active:scale-95;
+  }
+
+  /* 玻璃拟态卡片 */
+  .glass {
+    @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md;
+  }
+}
