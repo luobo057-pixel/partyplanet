@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NPC_PROFILES } from '@/services/mocks/npcData';
@@ -18,6 +18,10 @@ export default function MatchingPage() {
   const [progress, setProgress] = useState(0);
   const [flashIndex, setFlashIndex] = useState(0);
 
+  /** One-shot completion guard; nav timer cleared on unmount (Cancel) */
+  const completedRef = useRef(false);
+  const navTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
   // Cycle through NPC avatars
   useEffect(() => {
     const timer = setInterval(() => {
@@ -26,28 +30,37 @@ export default function MatchingPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Progress + completion
+  // Progress ticker only — no side effects inside the state updater
   useEffect(() => {
     const timer = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) {
-          clearInterval(timer);
-          const rooms = getMockRooms();
-          let target;
-          if (targetGameType) {
-            target =
-              rooms.find((r) => r.gameType === targetGameType && r.isHot) ??
-              rooms.find((r) => r.gameType === targetGameType);
-          }
-          target = target ?? rooms.find((r) => r.isHot) ?? rooms[0];
-          setTimeout(() => navigate(`/room/${target.id}`), 300);
-          return 100;
-        }
-        return Math.min(100, p + 4);
-      });
+      setProgress((p) => Math.min(100, p + 4));
     }, 100);
     return () => clearInterval(timer);
-  }, [navigate, targetGameType]);
+  }, []);
+
+  // Completion watcher: pick target room and navigate (cancellable)
+  useEffect(() => {
+    if (progress < 100 || completedRef.current) return;
+    completedRef.current = true;
+
+    const rooms = getMockRooms();
+    let target;
+    if (targetGameType) {
+      target =
+        rooms.find((r) => r.gameType === targetGameType && r.isHot) ??
+        rooms.find((r) => r.gameType === targetGameType);
+    }
+    target = target ?? rooms.find((r) => r.isHot) ?? rooms[0];
+
+    navTimerRef.current = setTimeout(() => navigate(`/room/${target.id}`), 300);
+  }, [progress, navigate, targetGameType]);
+
+  // Unmount (Cancel or leave): kill the pending navigation
+  useEffect(() => {
+    return () => {
+      if (navTimerRef.current) clearTimeout(navTimerRef.current);
+    };
+  }, []);
 
   const currentNpc = NPC_PROFILES[flashIndex];
 

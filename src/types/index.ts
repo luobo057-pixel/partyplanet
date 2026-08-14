@@ -95,23 +95,3 @@ export interface ChatMessage {
   emoji?: string;
   createdAt: number;
 }
-
-// ============ Game events (synced in-room) ============
-
-export type GameEvent =
-  | { type: 'game-start'; gameType: GameType }
-  | { type: 'game-end' }
-  | { type: 'turn-select'; playerId: PlayerId }
-  | { type: 'choice'; playerId: PlayerId; choice: 'truth' | 'dare' }
-  | { type: 'question'; text: string }
-  | { type: 'answer'; playerId: PlayerId; text: string }
-  | { type: 'react'; emoji: string; fromPlayerId: PlayerId };
-
-// ============ Friends ============
-
-export interface Friendship {
-  id: string;
-  player: Player;
-  online: boolean;
-  since: number;
-}

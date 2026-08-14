@@ -97,7 +97,8 @@ export default function LobbyPage() {
 // ============ Room card ============
 
 function RoomCard({ room, onClick }: { room: RoomWithHost; onClick: () => void }) {
-  const playerCount = room.players.length;
+  // displayCount carries the big-room occupancy; players array is the interactive roster
+  const playerCount = Math.min(room.displayCount ?? room.players.length, room.maxPlayers);
   const shownPlayers = room.players.slice(0, 5);
 
   return (

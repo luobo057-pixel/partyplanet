@@ -35,20 +35,15 @@ export type IconName =
   | 'coin' // 金币
   | 'gem' // 游戏币（钻石）
   // 其他
-  | 'sparkles' // 装饰
   // 社交关系
   | 'pen' // 签名
-  | 'shield' // 守护
   | 'heart-handshake' // 亲密关系
-  | 'graduation' // 师徒
   | 'users' // 家族
-  | 'house' // 家园
   | 'gift' // 礼物
   | 'star' // 星星
   | 'trophy' // 战绩/奖杯
   | 'image' // 动态图片
   | 'shopping-bag' // 资产/购物
-  | 'firework' // 烟花（装饰）
   | 'more'; // 更多（三点菜单）
 
 interface IconProps extends Omit<SVGProps<SVGSVGElement>, 'name'> {
@@ -166,24 +161,12 @@ const PATHS: Record<IconName, JSX.Element> = {
   ),
 
   // ============ 其他 ============
-  sparkles: (
-    <>
-      <path d="M12 3v4M12 17v4M3 12h4M17 12h4" strokeLinecap="round" />
-      <path d="M12 8c.5 2 1.5 3 4 4-2.5 1-3.5 2-4 4-.5-2-1.5-3-4-4 2.5-1 3.5-2 4-4Z" strokeLinejoin="round" />
-    </>
-  ),
 
   // ============ Social relations ============
   pen: (
     <>
       <path d="M12 19l7-7 3 3-7 7-3-3Z M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5Z M2 2l7.586 7.586" strokeLinejoin="round" />
       <circle cx="11" cy="11" r="2" />
-    </>
-  ),
-  shield: (
-    <>
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" strokeLinejoin="round" />
-      <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
     </>
   ),
   'heart-handshake': (
@@ -193,26 +176,11 @@ const PATHS: Record<IconName, JSX.Element> = {
       <path d="M8 14c2-3 5-3 7-1l1 1-3 3-1-1c-1-1-3-1-4 0l-2 2 1 1c2 2 5 2 7 0l4-4" strokeLinejoin="round" />
     </>
   ),
-  graduation: (
-    <>
-      <path d="M22 10 12 5 2 10l10 5 10-5Z" strokeLinejoin="round" />
-      <path d="M6 12v5c0 1 2.5 3 6 3s6-2 6-3v-5" strokeLinejoin="round" />
-      <path d="M22 10v6" strokeLinecap="round" />
-    </>
-  ),
   users: (
     <>
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="4" />
       <path d="M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75" />
-    </>
-  ),
-  house: (
-    <>
-      <path d="M3 12 12 3l9 9" strokeLinejoin="round" />
-      <path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10" strokeLinejoin="round" />
-      <path d="M10 21v-6h4v6" strokeLinejoin="round" />
-      <path d="M9 11h6" strokeLinecap="round" />
     </>
   ),
   gift: (
@@ -248,12 +216,6 @@ const PATHS: Record<IconName, JSX.Element> = {
       <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" strokeLinejoin="round" />
       <path d="M3 6h18" />
       <path d="M16 10a4 4 0 0 1-8 0" strokeLinecap="round" />
-    </>
-  ),
-  firework: (
-    <>
-      <circle cx="12" cy="12" r="2" />
-      <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3" strokeLinecap="round" />
     </>
   ),
   more: (

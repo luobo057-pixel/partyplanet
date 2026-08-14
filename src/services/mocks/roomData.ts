@@ -1,5 +1,5 @@
-import type { Room, RoomId, RoomVibe, GameType } from '@/types';
-import { NPC_PROFILES, pickNpcsWithout, type NpcProfile } from './npcData';
+import type { Room, RoomId, RoomVibe, GameType, Player } from '@/types';
+import { NPC_PROFILES, pickNpcsWithout } from './npcData';
 
 /**
  * Mock room data for the rooms tab and matching.
@@ -7,9 +7,12 @@ import { NPC_PROFILES, pickNpcsWithout, type NpcProfile } from './npcData';
  */
 
 export interface RoomWithHost extends Room {
-  host: NpcProfile;
+  /** Room host (NPC by default; real player takes over on enter) */
+  host: Player;
   announcement: string;
   isHot?: boolean;
+  /** Displayed occupancy (supports big-room feel beyond the interactive NPC roster) */
+  displayCount?: number;
 }
 
 const ROOM_TEMPLATES: Array<{
@@ -114,6 +117,7 @@ export function getMockRooms(): RoomWithHost[] {
       maxPlayers: 20,
       isPlaying: tpl.gameType !== 'none',
       isHot: tpl.isHot,
+      displayCount: tpl.playerCount,
     };
   });
 

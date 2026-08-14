@@ -68,7 +68,13 @@ export const usePlayerStore = create<PlayerStore>()(
       },
       setPlayer: (player) => set({ player }),
     }),
-    { name: 'partyplanet-player' },
+    {
+      name: 'partyplanet-player',
+      version: 2,
+      // v1 guests predate English nicknames and coins/gems —
+      // reset so ensureGuest() regenerates a complete profile
+      migrate: () => ({ player: null }),
+    },
   ),
 );
 

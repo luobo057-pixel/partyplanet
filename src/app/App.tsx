@@ -5,7 +5,6 @@ import { usePlayerStore } from '@/stores/usePlayerStore';
 
 // 页面（阶段 0 先占位，后续阶段填充）
 import HomePage from '@/features/home/HomePage';
-import OnboardingPage from '@/features/auth/OnboardingPage';
 import LobbyPage from '@/features/lobby/LobbyPage';
 import MatchingPage from '@/features/social/MatchingPage';
 import FriendsPage from '@/features/social/FriendsPage';
@@ -29,7 +28,6 @@ export default function App() {
         <Route path="/friends" element={<FriendsPage />} />
         <Route path="/room/:roomId" element={<RoomPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppShell>

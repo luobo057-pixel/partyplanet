@@ -73,8 +73,3 @@ export function randomDialogue(personality: NpcPersonality): string {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-export function randomAnyDialogue(): string {
-  const allPersonalities = Object.keys(DIALOGUES) as NpcPersonality[];
-  const p = allPersonalities[Math.floor(Math.random() * allPersonalities.length)];
-  return randomDialogue(p);
-}

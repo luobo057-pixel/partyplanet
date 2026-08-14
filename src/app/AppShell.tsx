@@ -9,7 +9,7 @@ import { Icon, type IconName } from '@/shared/components/Icon';
  * - 在不需要底部 Tab 的页面（房间、匹配、编辑器）隐藏导航栏
  */
 
-const HIDE_TAB_ROUTES = ['/onboarding', '/matching', '/friends'];
+const HIDE_TAB_ROUTES = ['/matching', '/friends'];
 const HIDE_TAB_PREFIXES = ['/room/'];
 
 interface AppShellProps {

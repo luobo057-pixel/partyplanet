@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ChatMessage, Player, PlayerId } from '@/types';
 import { SimpleAvatar } from '@/shared/components/SimpleAvatar';
@@ -89,11 +89,8 @@ const QUICK_EMOJIS = ['😀', '😂', '🥰', '🎉', '👍', '🔥', '😱', '�
 export function ChatInputBar({ value, onChange, onSend, onEmoji }: ChatInputBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 自动聚焦
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
+  // Note: no auto-focus on mount — mobile keyboards shouldn't pop up
+  // just from entering a room. Focus returns after sending instead.
   const handleSend = () => {
     if (!value.trim()) return;
     onSend();
