@@ -10,7 +10,7 @@ import {
   VIBE_LABELS,
   type RoomWithHost,
 } from '@/services/mocks/roomData';
-import { GAME_ICON_MAP } from '@/shared/config/gameIcons';
+import { GameTileIcon } from './GameTileIcon';
 import type { GameType } from '@/types';
 
 /**
@@ -106,9 +106,9 @@ function RoomCard({ room, onClick }: { room: RoomWithHost; onClick: () => void }
       onClick={onClick}
       className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-white/5 bg-night-800 p-3 text-left transition active:scale-[0.98]"
     >
-      {/* Game icon */}
+      {/* Game tile icon */}
       <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-white/10 to-transparent">
-        <Icon name={GAME_ICON_MAP[room.gameType]} size={30} className="text-white/90" />
+        <GameTileIcon gameType={room.gameType} size={40} />
         {room.isPlaying && (
           <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-brand-500 px-1.5 py-0.5 text-micro font-bold leading-none">
             LIVE
