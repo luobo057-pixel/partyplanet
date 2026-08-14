@@ -86,7 +86,7 @@ export default function MatchingPage() {
         <motion.p
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="text-lg font-medium text-white/80"
+          className="text-lg font-medium text-white/90"
         >
           {targetGameType && targetGameType !== 'none'
             ? `Finding "${GAME_TYPE_LABELS[targetGameType]}" buddies...`

@@ -172,7 +172,7 @@ export default function RoomPage() {
             <h1 className="truncate font-semibold">{room.name}</h1>
             {room.isHot && <Icon name="fire" size={14} className="shrink-0 text-orange-400" />}
           </div>
-          <p className="truncate text-[11px] text-white/40">{room.announcement}</p>
+          <p className="truncate text-xs text-white/40">{room.announcement}</p>
         </div>
         <div className="flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-xs">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />

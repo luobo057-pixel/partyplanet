@@ -47,7 +47,7 @@ export function GameStage({
 
         <div>
           <p className="text-lg font-semibold">{roomName}</p>
-          <p className="mt-1 text-sm text-white/50">
+          <p className="mt-1 text-sm text-white/40">
             {gameType === 'none'
               ? 'Chat-only room, free social'
               : `Now playing: ${GAME_TYPE_LABELS[gameType]}`}

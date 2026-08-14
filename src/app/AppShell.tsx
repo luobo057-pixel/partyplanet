@@ -29,14 +29,14 @@ export default function AppShell({ children }: AppShellProps) {
     <div className="app-shell">
       {/* 页面主体 */}
       <main className="relative flex-1 overflow-hidden">
-        <AnimatePresence mode="wait">
+        <AnimatePresence initial={false}>
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="h-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-0 h-full"
           >
             {children}
           </motion.div>
@@ -94,7 +94,7 @@ function TabButton({
     <button
       onClick={onClick}
       className={`flex flex-1 flex-col items-center gap-0.5 py-1 transition ${
-        active ? 'text-white' : 'text-white/50'
+        active ? 'text-white' : 'text-white/40'
       }`}
     >
       <Icon name={icon} size={22} />

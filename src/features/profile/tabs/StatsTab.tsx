@@ -13,7 +13,7 @@ interface StatsTabProps {
 export function StatsTab({ stats }: StatsTabProps) {
   if (stats.length === 0) {
     return (
-      <div className="flex flex-col items-center py-16 text-white/30">
+      <div className="flex flex-col items-center py-16 text-white/40">
         <Icon name="trophy" size={48} className="mb-2 text-white/20" />
         <p className="text-sm">No games played yet</p>
       </div>
@@ -29,11 +29,11 @@ export function StatsTab({ stats }: StatsTabProps) {
             {/* Header */}
             <div className="mb-3 flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5">
-                <Icon name={GAME_ICON_MAP[stat.gameType]} size={24} className="text-white/80" />
+                <Icon name={GAME_ICON_MAP[stat.gameType]} size={24} className="text-white/90" />
               </div>
               <div className="flex-1">
                 <p className="font-semibold">{GAME_TYPE_LABELS[stat.gameType]}</p>
-                <p className="text-xs text-white/50">{stat.tier}</p>
+                <p className="text-xs text-white/40">{stat.tier}</p>
               </div>
               <span className="rounded-md bg-amber-400/20 px-2 py-0.5 text-xs font-bold text-amber-300">
                 {stat.rankPoints} RP
@@ -78,7 +78,7 @@ function MiniStat({
       <span className={`text-base font-bold ${highlight ? 'text-amber-400' : 'text-white/90'}`}>
         {value}
       </span>
-      <span className="text-[10px] text-white/40">{label}</span>
+      <span className="text-micro text-white/40">{label}</span>
     </div>
   );
 }

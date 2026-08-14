@@ -58,7 +58,7 @@ export function ChatOverlay({ messages, playersById, currentUserId }: ChatOverla
                 }`}
               >
                 {!isMe && sender && (
-                  <p className="mb-0.5 text-[10px] font-medium text-white/50">
+                  <p className="mb-0.5 text-micro font-medium text-white/40">
                     {sender.nickname}
                   </p>
                 )}
@@ -124,7 +124,7 @@ export function ChatInputBar({ value, onChange, onSend, onEmoji }: ChatInputBarP
             if (e.key === 'Enter') handleSend();
           }}
           placeholder="Say something..."
-          className="flex-1 rounded-full bg-white/10 px-4 py-2 text-sm outline-none placeholder:text-white/30 focus:bg-white/15"
+          className="flex-1 rounded-full bg-white/10 px-4 py-2 text-sm outline-none placeholder:text-white/40 focus:bg-white/10"
         />
         <button
           onClick={handleSend}

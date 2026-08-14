@@ -71,8 +71,8 @@ function GiftWall({ gifts }: { gifts: Gift[] }) {
           className="flex flex-col items-center rounded-xl bg-white/5 p-2 text-center"
         >
           <span className="text-3xl">{g.emoji}</span>
-          <span className="mt-1 text-[10px] font-medium text-white/80">{g.name}</span>
-          <span className="text-[10px] text-white/40">×{g.count}</span>
+          <span className="mt-1 text-micro font-medium text-white/90">{g.name}</span>
+          <span className="text-micro text-white/40">×{g.count}</span>
         </div>
       ))}
       {/* Locked slots to show "more to collect" */}
@@ -81,8 +81,8 @@ function GiftWall({ gifts }: { gifts: Gift[] }) {
           key={`locked-${i}`}
           className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 p-2 text-center"
         >
-          <span className="text-2xl text-white/15">?</span>
-          <span className="mt-1 text-[10px] text-white/20">Locked</span>
+          <span className="text-2xl text-white/10">?</span>
+          <span className="mt-1 text-micro text-white/20">Locked</span>
         </div>
       ))}
     </div>
@@ -108,20 +108,20 @@ function TitleWall({ achievements }: { achievements: Achievement[] }) {
               <div className="flex items-center gap-1.5">
                 <p className="text-sm font-semibold">{a.title}</p>
                 <span
-                  className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${RARITY_BADGE[a.rarity]}`}
+                  className={`rounded px-1.5 py-0.5 text-micro font-bold uppercase ${RARITY_BADGE[a.rarity]}`}
                 >
                   {a.rarity}
                 </span>
               </div>
-              <p className="text-xs text-white/50">{a.description}</p>
+              <p className="text-xs text-white/40">{a.description}</p>
               {earned && (
-                <p className="mt-0.5 text-[10px] text-emerald-400">
+                <p className="mt-0.5 text-micro text-emerald-400">
                   Earned {a.earnedAt}
                 </p>
               )}
             </div>
             {!earned && (
-              <span className="text-xs text-white/30">🔒</span>
+              <span className="text-xs text-white/40">🔒</span>
             )}
           </div>
         );
@@ -131,7 +131,7 @@ function TitleWall({ achievements }: { achievements: Achievement[] }) {
 }
 
 const RARITY_BADGE: Record<string, string> = {
-  common: 'bg-white/10 text-white/60',
+  common: 'bg-white/10 text-white/70',
   rare: 'bg-sky-500/20 text-sky-300',
   epic: 'bg-violet-500/20 text-violet-300',
   legendary: 'bg-amber-500/20 text-amber-300',
@@ -152,7 +152,7 @@ function SubTabButton({
     <button
       onClick={onClick}
       className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-medium transition ${
-        active ? 'bg-white/15 text-white' : 'bg-white/5 text-white/50'
+        active ? 'bg-white/10 text-white' : 'bg-white/5 text-white/40'
       }`}
     >
       <Icon name={icon} size={14} />

@@ -24,7 +24,7 @@ export default function OnboardingPage() {
         <h1 className="bg-gradient-to-r from-brand-400 to-accent-400 bg-clip-text text-5xl font-bold text-transparent">
           PartyPlanet
         </h1>
-        <p className="text-white/60">Meet interesting souls here</p>
+        <p className="text-white/70">Meet interesting souls here</p>
       </motion.div>
 
       {/* Avatar preview */}
@@ -55,7 +55,7 @@ export default function OnboardingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="relative text-lg font-medium text-white/80"
+          className="relative text-lg font-medium text-white/90"
         >
           Hi, {player.nickname}
         </motion.p>

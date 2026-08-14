@@ -76,7 +76,7 @@ export default function HomePage() {
           <div>
             <div className="flex items-center gap-1.5">
               <p className="font-semibold leading-tight">{player?.nickname}</p>
-              <span className="rounded-md bg-gradient-to-r from-amber-400 to-orange-500 px-1.5 py-0.5 text-[10px] font-bold leading-none text-night-900">
+              <span className="rounded-md bg-gradient-to-r from-amber-400 to-orange-500 px-1.5 py-0.5 text-micro font-bold leading-none text-night-900">
                 Lv.{player?.level ?? 1}
               </span>
             </div>
@@ -101,7 +101,7 @@ export default function HomePage() {
         {/* Title */}
         <div className="mb-4 mt-2">
           <h1 className="text-2xl font-bold">What to play?</h1>
-          <p className="mt-0.5 text-sm text-white/50">Pick a game, match in 30s</p>
+          <p className="mt-0.5 text-sm text-white/40">Pick a game, match in 30s</p>
         </div>
 
         {/* Game entries grid */}
@@ -150,7 +150,7 @@ export default function HomePage() {
           <Icon name="bolt" size={28} className="text-amber-400" />
           <div className="flex-1">
             <p className="font-semibold">Quick Match</p>
-            <p className="text-xs text-white/50">No preference, play whatever</p>
+            <p className="text-xs text-white/40">No preference, play whatever</p>
           </div>
           <Icon name="back" size={18} className="rotate-180 text-white/40" />
         </motion.button>

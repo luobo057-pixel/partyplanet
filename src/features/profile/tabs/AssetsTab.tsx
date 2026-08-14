@@ -16,7 +16,7 @@ const CATEGORY_LABELS: { key: AssetCategory | 'all'; label: string }[] = [
 ];
 
 const RARITY_STYLES: Record<string, string> = {
-  common: 'bg-white/10 text-white/60',
+  common: 'bg-white/10 text-white/70',
   rare: 'bg-sky-500/20 text-sky-300',
   epic: 'bg-violet-500/20 text-violet-300',
   legendary: 'bg-amber-500/20 text-amber-300',
@@ -52,7 +52,7 @@ export function AssetsTab({ assets }: AssetsTabProps) {
             className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition ${
               filter === cat.key
                 ? 'bg-white text-night-900'
-                : 'bg-white/10 text-white/60'
+                : 'bg-white/10 text-white/70'
             }`}
           >
             {cat.label}
@@ -62,7 +62,7 @@ export function AssetsTab({ assets }: AssetsTabProps) {
 
       {/* Asset grid */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center py-12 text-white/30">
+        <div className="flex flex-col items-center py-12 text-white/40">
           <Icon name="shopping-bag" size={48} className="mb-2 text-white/20" />
           <p className="text-sm">No items in this category</p>
         </div>
@@ -74,21 +74,21 @@ export function AssetsTab({ assets }: AssetsTabProps) {
               className="relative flex flex-col items-center rounded-xl bg-white/5 p-3 text-center"
             >
               {asset.equipped && (
-                <span className="absolute right-1 top-1 rounded bg-emerald-500/30 px-1 text-[8px] font-bold text-emerald-300">
+                <span className="absolute right-1 top-1 rounded bg-emerald-500/30 px-1 text-micro font-bold text-emerald-300">
                   ON
                 </span>
               )}
               <span className="text-3xl">{asset.emoji}</span>
-              <span className="mt-1 line-clamp-1 text-[10px] font-medium text-white/80">
+              <span className="mt-1 line-clamp-1 text-micro font-medium text-white/90">
                 {asset.name}
               </span>
               <span
-                className={`mt-0.5 rounded px-1 py-0.5 text-[8px] font-bold uppercase ${RARITY_STYLES[asset.rarity]}`}
+                className={`mt-0.5 rounded px-1 py-0.5 text-micro font-bold uppercase ${RARITY_STYLES[asset.rarity]}`}
               >
                 {asset.rarity}
               </span>
               {asset.daysLeft && (
-                <span className="mt-0.5 text-[9px] text-amber-400">{asset.daysLeft}d left</span>
+                <span className="mt-0.5 text-micro text-amber-400">{asset.daysLeft}d left</span>
               )}
             </div>
           ))}

@@ -41,12 +41,7 @@ export default function LobbyPage() {
     <div className="flex h-full flex-col">
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 pt-4 pb-3">
-        <div>
-          <h1 className="text-2xl font-bold">Rooms</h1>
-          <p className="mt-0.5 text-xs text-white/50">
-            {allRooms.length} parties in progress · pick one to join
-          </p>
-        </div>
+        <h1 className="text-2xl font-bold">Rooms</h1>
         <button
           onClick={() => navigate('/')}
           className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70"
@@ -66,7 +61,7 @@ export default function LobbyPage() {
               className={`relative shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
                 category === cat.key
                   ? 'bg-white text-night-900'
-                  : 'bg-white/10 text-white/60'
+                  : 'bg-white/10 text-white/70'
               }`}
             >
               {cat.label}
@@ -88,7 +83,7 @@ export default function LobbyPage() {
           ))}
 
           {filteredRooms.length === 0 && (
-            <div className="flex flex-col items-center py-16 text-white/30">
+            <div className="flex flex-col items-center py-16 text-white/40">
               <Icon name="chat" size={40} className="mb-2 text-white/20" />
               <p className="text-sm">No rooms in this category</p>
             </div>
@@ -111,10 +106,10 @@ function RoomCard({ room, onClick }: { room: RoomWithHost; onClick: () => void }
       className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-white/5 bg-night-800 p-3 text-left transition active:scale-[0.98]"
     >
       {/* Game icon */}
-      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-white/10 to-white/0">
-        <Icon name={GAME_ICON_MAP[room.gameType]} size={30} className="text-white/80" />
+      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-white/10 to-transparent">
+        <Icon name={GAME_ICON_MAP[room.gameType]} size={30} className="text-white/90" />
         {room.isPlaying && (
-          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-brand-500 px-1.5 py-0.5 text-[9px] font-bold leading-none">
+          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-brand-500 px-1.5 py-0.5 text-micro font-bold leading-none">
             LIVE
           </span>
         )}
@@ -128,8 +123,8 @@ function RoomCard({ room, onClick }: { room: RoomWithHost; onClick: () => void }
             <Icon name="fire" size={14} className="shrink-0 text-orange-400" />
           )}
         </div>
-        <div className="mt-0.5 flex items-center gap-2 text-xs text-white/50">
-          <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${VIBE_STYLES[room.vibe]}`}>
+        <div className="mt-0.5 flex items-center gap-2 text-xs text-white/40">
+          <span className={`rounded px-1.5 py-0.5 text-micro font-medium ${VIBE_STYLES[room.vibe]}`}>
             {VIBE_LABELS[room.vibe]}
           </span>
           <span className="truncate">{GAME_TYPE_LABELS[room.gameType]}</span>
@@ -146,7 +141,7 @@ function RoomCard({ room, onClick }: { room: RoomWithHost; onClick: () => void }
             </div>
           ))}
         </div>
-        <span className="text-xs font-medium text-white/60">{playerCount}/{room.maxPlayers}</span>
+        <span className="text-xs font-medium text-white/70">{playerCount}/{room.maxPlayers}</span>
       </div>
     </button>
   );

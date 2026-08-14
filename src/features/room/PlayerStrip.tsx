@@ -64,7 +64,7 @@ export function PlayerStrip({
                 />
               </motion.div>
               {isMe && (
-                <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 rounded-full bg-brand-500 px-1.5 text-[9px] font-bold leading-tight">
+                <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 rounded-full bg-brand-500 px-1.5 text-micro font-bold leading-tight">
                   Me
                 </span>
               )}
@@ -75,14 +75,14 @@ export function PlayerStrip({
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="max-w-[60px] truncate rounded bg-white/15 px-1.5 py-0.5 text-[10px]"
+                  className="max-w-[60px] truncate rounded bg-white/10 px-1.5 py-0.5 text-micro"
                 >
                   {player.nickname}
                 </motion.span>
               )}
             </AnimatePresence>
             {!isSpeaking && (
-              <span className="max-w-[52px] truncate text-[10px] text-white/40">
+              <span className="max-w-[52px] truncate text-micro text-white/40">
                 {isMe ? 'Me' : player.nickname}
               </span>
             )}

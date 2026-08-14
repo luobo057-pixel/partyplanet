@@ -28,7 +28,7 @@ export function OverviewTab({
     <div className="space-y-3">
       {/* Stats summary */}
       <section className="glass p-4">
-        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/80">
+        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
           <Icon name="trophy" size={16} className="text-amber-400" />
           Highlights
         </h3>
@@ -44,18 +44,18 @@ export function OverviewTab({
 
       {/* Best game */}
       <section className="glass p-4">
-        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/80">
+        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
           <Icon name="game" size={16} className="text-brand-400" />
           Top Game
         </h3>
         {stats.length > 0 && (
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5">
-              <Icon name={GAME_ICON_MAP[stats[0].gameType]} size={24} className="text-white/80" />
+              <Icon name={GAME_ICON_MAP[stats[0].gameType]} size={24} className="text-white/90" />
             </div>
             <div className="flex-1">
               <p className="font-medium">{GAME_TYPE_LABELS[stats[0].gameType]}</p>
-              <p className="text-xs text-white/50">
+              <p className="text-xs text-white/40">
                 {stats[0].tier} · {stats[0].rankPoints} RP
               </p>
             </div>
@@ -68,7 +68,7 @@ export function OverviewTab({
 
       {/* Recent post */}
       <section className="glass p-4">
-        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/80">
+        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
           <Icon name="image" size={16} className="text-sky-400" />
           Latest Post
         </h3>
@@ -77,7 +77,7 @@ export function OverviewTab({
             {recentPosts[0].emoji && (
               <span className="mb-1 block text-2xl">{recentPosts[0].emoji}</span>
             )}
-            <p className="text-sm text-white/80">{recentPosts[0].text}</p>
+            <p className="text-sm text-white/90">{recentPosts[0].text}</p>
             <p className="mt-2 text-xs text-white/40">
               {formatDate(recentPosts[0].createdAt)} · ❤ {recentPosts[0].likes}
             </p>
@@ -89,7 +89,7 @@ export function OverviewTab({
 
       {/* Featured achievement */}
       <section className="glass p-4">
-        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/80">
+        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
           <Icon name="star" size={16} className="text-violet-400" />
           Featured Achievement
         </h3>
@@ -108,7 +108,7 @@ export function OverviewTab({
       {/* Gift highlight */}
       {topGift && (
         <section className="glass p-4">
-          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/80">
+          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
             <Icon name="gift" size={16} className="text-rose-400" />
             Top Gift
           </h3>
@@ -116,7 +116,7 @@ export function OverviewTab({
             <span className="text-4xl">{topGift.emoji}</span>
             <div className="flex-1">
               <p className="font-medium">{topGift.name}</p>
-              <p className="text-xs text-white/50">
+              <p className="text-xs text-white/40">
                 ×{topGift.count} · {topGift.stars} stars
               </p>
             </div>
@@ -131,17 +131,17 @@ function Stat({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="flex flex-col items-center rounded-xl bg-white/5 py-3">
       <span className="text-lg font-bold text-brand-400">{value}</span>
-      <span className="text-[11px] text-white/40">{label}</span>
+      <span className="text-xs text-white/40">{label}</span>
     </div>
   );
 }
 
 function EmptyHint({ text }: { text: string }) {
-  return <p className="py-3 text-center text-sm italic text-white/30">{text}</p>;
+  return <p className="py-3 text-center text-sm italic text-white/40">{text}</p>;
 }
 
 export const RARITY_STYLES: Record<string, string> = {
-  common: 'bg-white/10 text-white/60',
+  common: 'bg-white/10 text-white/70',
   rare: 'bg-sky-500/20 text-sky-300',
   epic: 'bg-violet-500/20 text-violet-300',
   legendary: 'bg-amber-500/20 text-amber-300',

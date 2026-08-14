@@ -38,6 +38,11 @@ export default {
           'sans-serif',
         ],
       },
+      // 字号规范：micro(10) xs(12) sm(14) base(16) lg(18) xl(20) 2xl(24)
+      // micro 仅用于徽章/LIVE 标/角标，正文最小 xs
+      fontSize: {
+        micro: ['10px', { lineHeight: '12px' }],
+      },
       boxShadow: {
         glow: '0 0 24px rgba(244, 63, 94, 0.45)',
         card: '0 8px 32px rgba(0, 0, 0, 0.25)',
