@@ -1,13 +1,15 @@
+import { useNavigate } from 'react-router-dom';
 import type { Player } from '@/types';
 import type { GameStat } from '@/types/profile';
 import { SimpleAvatar } from '@/shared/components/SimpleAvatar';
 import { CurrencyBadge } from '@/shared/components/CurrencyBadge';
+import { useFriendCount } from '@/stores/useFriendsStore';
 
 /**
  * Profile hero — centered identity section.
  *
  * Spacious layout: large avatar, nickname + level, inline stats,
- * currencies and edit pill all in one calm column.
+ * currencies all in one calm column. Friends stat is tappable.
  */
 
 interface ProfileHeaderProps {
@@ -16,8 +18,10 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ player, stats }: ProfileHeaderProps) {
+  const navigate = useNavigate();
   const totalGames = stats.reduce((s, g) => s + g.totalGames, 0);
   const totalWins = stats.reduce((s, g) => s + g.wins, 0);
+  const friendCount = useFriendCount();
 
   return (
     <section className="relative overflow-hidden pb-1 pt-10 text-center">
@@ -47,13 +51,18 @@ export function ProfileHeader({ player, stats }: ProfileHeaderProps) {
           ID {player.id.slice(0, 10)}
         </p>
 
-        {/* 内联统计：Games / Wins / Friends */}
+        {/* 内联统计：Games / Wins / Friends（Friends 可点击进好友列表） */}
         <div className="mt-5 flex items-center">
           <Stat value={totalGames} label="Games" />
           <Divider />
           <Stat value={totalWins} label="Wins" />
           <Divider />
-          <Stat value={0} label="Friends" />
+          <button
+            onClick={() => navigate('/friends')}
+            className="transition active:scale-95"
+          >
+            <Stat value={friendCount} label="Friends" />
+          </button>
         </div>
 
         {/* 资产 */}

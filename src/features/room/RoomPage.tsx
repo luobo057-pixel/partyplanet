@@ -7,8 +7,9 @@ import { randomDialogue } from '@/services/mocks/npcDialogue';
 import { PlayerStrip } from './PlayerStrip';
 import { GameStage } from './GameStage';
 import { ChatOverlay, ChatInputBar } from './ChatOverlay';
+import { PlayerCardSheet } from '@/features/social/PlayerCardSheet';
 import { Icon } from '@/shared/components/Icon';
-import type { ChatMessage } from '@/types';
+import type { ChatMessage, Player } from '@/types';
 
 /**
  * 房间页（核心场景）
@@ -37,6 +38,7 @@ export default function RoomPage() {
 
   const [draft, setDraft] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
   // 进入房间：加载 Mock 房间数据
   useEffect(() => {
@@ -186,6 +188,7 @@ export default function RoomPage() {
         hostId={room.hostId}
         currentUserId={currentPlayer?.id ?? null}
         speakingPlayerId={speakingPlayerId}
+        onSelectPlayer={(p) => setSelectedPlayer(p)}
       />
 
       {/* 游戏舞台 + 聊天浮层（相对定位容器） */}
@@ -207,6 +210,11 @@ export default function RoomPage() {
 
       {/* 底部输入栏 */}
       <ChatInputBar value={draft} onChange={setDraft} onSend={handleSend} onEmoji={handleEmoji} />
+
+      {/* 玩家卡片弹层（点头像打开，加好友） */}
+      {selectedPlayer && (
+        <PlayerCardSheet player={selectedPlayer} onClose={() => setSelectedPlayer(null)} />
+      )}
     </div>
   );
 }

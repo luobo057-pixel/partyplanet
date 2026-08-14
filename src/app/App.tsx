@@ -8,6 +8,7 @@ import HomePage from '@/features/home/HomePage';
 import OnboardingPage from '@/features/auth/OnboardingPage';
 import LobbyPage from '@/features/lobby/LobbyPage';
 import MatchingPage from '@/features/social/MatchingPage';
+import FriendsPage from '@/features/social/FriendsPage';
 import RoomPage from '@/features/room/RoomPage';
 import ProfilePage from '@/features/profile/ProfilePage';
 
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/lobby" element={<LobbyPage />} />
         <Route path="/matching" element={<MatchingPage />} />
+        <Route path="/friends" element={<FriendsPage />} />
         <Route path="/room/:roomId" element={<RoomPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />

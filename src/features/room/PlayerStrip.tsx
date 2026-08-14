@@ -4,13 +4,12 @@ import type { Player, PlayerId } from '@/types';
 import { SimpleAvatar } from '@/shared/components/SimpleAvatar';
 
 /**
- * 玩家头像条
+ * Player strip — horizontal player list at the top of a room.
  *
- * 房间顶部的横向玩家列表：
- * - 紧凑展示所有在场玩家（支持 8-20 人横向滚动）
- * - 房主带皇冠角标
- * - 正在发言的头像放大 + 高亮环 + 名字气泡
- * - 当前用户（自己）有特殊标记
+ * - Compact, scrollable (8-20 players)
+ * - Host carries a crown badge
+ * - Speaker avatar scales up + highlight ring + name bubble
+ * - Every avatar is tappable → opens player card (add friend)
  */
 
 interface PlayerStripProps {
@@ -18,6 +17,8 @@ interface PlayerStripProps {
   hostId: PlayerId;
   currentUserId: PlayerId | null;
   speakingPlayerId: PlayerId | null;
+  /** Tap an avatar to open that player's card */
+  onSelectPlayer?: (player: Player) => void;
 }
 
 export function PlayerStrip({
@@ -25,10 +26,10 @@ export function PlayerStrip({
   hostId,
   currentUserId,
   speakingPlayerId,
+  onSelectPlayer,
 }: PlayerStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 默认滚到最前面
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollLeft = 0;
   }, []);
@@ -44,7 +45,11 @@ export function PlayerStrip({
         const isSpeaking = player.id === speakingPlayerId;
 
         return (
-          <div key={player.id} className="flex shrink-0 flex-col items-center gap-1">
+          <button
+            key={player.id}
+            onClick={() => onSelectPlayer?.(player)}
+            className="flex shrink-0 flex-col items-center gap-1 transition active:scale-95"
+          >
             <div className="relative">
               <motion.div
                 animate={
@@ -86,7 +91,7 @@ export function PlayerStrip({
                 {isMe ? 'Me' : player.nickname}
               </span>
             )}
-          </div>
+          </button>
         );
       })}
     </div>
