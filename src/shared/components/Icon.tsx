@@ -9,7 +9,7 @@ import { type SVGProps } from 'react';
  * - 通过 size prop 控制尺寸（默认 24）
  *
  * 用法：
- *   <Icon name="home" size={24} className="text-white/60" />
+ *   <Icon name="home" size={24} className="text-white/70" />
  */
 
 export type IconName =
@@ -48,7 +48,8 @@ export type IconName =
   | 'trophy' // 战绩/奖杯
   | 'image' // 动态图片
   | 'shopping-bag' // 资产/购物
-  | 'firework'; // 烟花（装饰）
+  | 'firework' // 烟花（装饰）
+  | 'more'; // 更多（三点菜单）
 
 interface IconProps extends Omit<SVGProps<SVGSVGElement>, 'name'> {
   name: IconName;
@@ -59,22 +60,25 @@ const PATHS: Record<IconName, JSX.Element> = {
   // ============ 导航 & 通用 ============
   home: (
     <>
-      <path d="M3 10.5 12 3l9 7.5" />
-      <path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" />
-      <path d="M9.5 21v-6h5v6" />
+      {/* 屋顶：人字线 */}
+      <path d="M3 10.5 12 3l9 7.5" strokeLinejoin="round" />
+      {/* 房身：U 形，与屋顶留 2 单位间隙（半透明描边相交会叠出亮点） */}
+      <path d="M6 12v7a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-7" />
     </>
   ),
   game: (
     <>
-      <rect x="2" y="7" width="20" height="11" rx="4" />
-      <path d="M7 12v3M5.5 13.5h3" strokeLinecap="round" />
-      <circle cx="15.5" cy="11.5" r="0.8" fill="currentColor" stroke="none" />
-      <circle cx="18" cy="14" r="0.8" fill="currentColor" stroke="none" />
+      {/* 2×2 房间网格：格子间留 2 单位描边间隙，小尺寸下不粘连 */}
+      <rect x="3.5" y="3.5" width="6.5" height="6.5" rx="2" />
+      <rect x="14" y="3.5" width="6.5" height="6.5" rx="2" />
+      <rect x="3.5" y="14" width="6.5" height="6.5" rx="2" />
+      <rect x="14" y="14" width="6.5" height="6.5" rx="2" />
     </>
   ),
   user: (
     <>
-      <circle cx="12" cy="8" r="4" />
+      {/* 头部上移，与肩膀描边带留 1 单位间隙（避免半透明叠点） */}
+      <circle cx="12" cy="7" r="4" />
       <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
     </>
   ),
@@ -250,6 +254,13 @@ const PATHS: Record<IconName, JSX.Element> = {
     <>
       <circle cx="12" cy="12" r="2" />
       <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3" strokeLinecap="round" />
+    </>
+  ),
+  more: (
+    <>
+      <circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+      <circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none" />
     </>
   ),
 };

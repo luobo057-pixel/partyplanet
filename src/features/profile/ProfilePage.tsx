@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { usePlayerStore } from '@/stores/usePlayerStore';
 import { Icon, type IconName } from '@/shared/components/Icon';
 import { ProfileHeader } from './ProfileHeader';
@@ -19,103 +18,139 @@ import {
 
 type TabKey = 'overview' | 'stats' | 'posts' | 'honors' | 'assets';
 
-const TABS: { key: TabKey; label: string; icon: IconName }[] = [
-  { key: 'overview', label: 'Home', icon: 'home' },
-  { key: 'stats', label: 'Stats', icon: 'trophy' },
-  { key: 'posts', label: 'Posts', icon: 'image' },
-  { key: 'honors', label: 'Honors', icon: 'gift' },
-  { key: 'assets', label: 'Assets', icon: 'shopping-bag' },
+const TABS: { key: TabKey; label: string }[] = [
+  { key: 'overview', label: 'Home' },
+  { key: 'stats', label: 'Stats' },
+  { key: 'posts', label: 'Posts' },
+  { key: 'honors', label: 'Honors' },
+  { key: 'assets', label: 'Assets' },
 ];
 
+/**
+ * Profile page — hero-centric layout.
+ *
+ * Centered identity hero at top, text-only tab bar with underline
+ * indicator, tab content below. Settings floats top-right.
+ */
 export default function ProfilePage() {
-  const navigate = useNavigate();
   const player = usePlayerStore((s) => s.player);
   const [tab, setTab] = useState<TabKey>('overview');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   if (!player) {
     return (
-      <div className="flex h-full items-center justify-center text-white/40">
+      <div className="flex h-full items-center justify-center text-sm text-white/40">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Top bar */}
-      <header className="flex items-center justify-between px-4 py-3">
-        <h1 className="text-xl font-bold">Profile</h1>
-        <button className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70">
-          <Icon name="settings" size={18} />
-        </button>
-      </header>
+    <div className="relative flex h-full flex-col">
+      {/* 点击遮罩关闭菜单 */}
+      {menuOpen && (
+        <div className="absolute inset-0 z-30" onClick={() => setMenuOpen(false)} />
+      )}
 
-      {/* Scrollable body */}
-      <div className="no-scrollbar flex-1 overflow-y-auto px-4 pb-4">
-        {/* Header: avatar + nickname + Lv + currencies */}
-        <ProfileHeader player={player} />
-
-        {/* Edit profile button */}
-        <button
-          onClick={() => navigate('/lobby')}
-          className="btn-ghost mt-3 w-full"
+      {/* 更多菜单（Edit Profile / Settings 综合于此） */}
+      {menuOpen && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: -4 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.12 }}
+          className="absolute right-4 top-14 z-40 w-44 overflow-hidden rounded-xl border border-white/10 bg-night-700 shadow-card"
         >
-          <Icon name="pen" size={16} className="mr-1.5" />
-          Edit Profile
-        </button>
+          <MenuItem icon="pen" label="Edit Profile" onClick={() => setMenuOpen(false)} />
+          <MenuItem icon="settings" label="Settings" onClick={() => setMenuOpen(false)} last />
+        </motion.div>
+      )}
 
-        {/* Tab bar */}
-        <div className="no-scrollbar sticky top-0 z-10 -mx-4 mt-3 flex gap-1 overflow-x-auto border-b border-white/10 bg-night-900/90 px-4 py-2 backdrop-blur">
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`relative flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                tab === t.key
-                  ? 'text-white'
-                  : 'text-white/50'
-              }`}
-            >
-              <Icon name={t.icon} size={14} />
-              {t.label}
-              {tab === t.key && (
-                <motion.span
-                  layoutId="profile-tab-active"
-                  className="absolute inset-0 -z-10 rounded-full bg-white/10"
-                />
-              )}
-            </button>
-          ))}
+      {/* 悬浮更多按钮 */}
+      <button
+        onClick={() => setMenuOpen((v) => !v)}
+        className="absolute right-4 top-3 z-40 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition active:scale-95"
+      >
+        <Icon name="more" size={18} />
+      </button>
+
+      {/* 滚动主体 */}
+      <div className="no-scrollbar flex-1 overflow-y-auto pb-6">
+        {/* Hero：居中头像 + 昵称 + 统计 + 资产 */}
+        <ProfileHeader player={player} stats={MOCK_STATS} />
+
+        {/* Tab bar：纯文字 + 下划线指示器 */}
+        <div className="sticky top-0 z-10 mt-4 border-b border-white/10 bg-night-900/90 backdrop-blur">
+          <div className="no-scrollbar flex overflow-x-auto">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`relative flex-1 shrink-0 px-2 py-2.5 text-sm font-medium transition ${
+                  tab === t.key ? 'text-white' : 'text-white/40'
+                }`}
+              >
+                {t.label}
+                {tab === t.key && (
+                  <motion.span
+                    layoutId="profile-tab-underline"
+                    className="absolute inset-x-4 bottom-0 h-0.5 rounded-full bg-brand-400"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Tab content */}
-        <div className="mt-4">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={tab}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.15 }}
-            >
-              {tab === 'overview' && (
-                <OverviewTab
-                  stats={MOCK_STATS}
-                  recentPosts={MOCK_POSTS}
-                  achievements={MOCK_ACHIEVEMENTS}
-                  gifts={MOCK_GIFTS}
-                />
-              )}
-              {tab === 'stats' && <StatsTab stats={MOCK_STATS} />}
-              {tab === 'posts' && <PostsTab player={player} posts={MOCK_POSTS} />}
-              {tab === 'honors' && (
-                <HonorsTab gifts={MOCK_GIFTS} achievements={MOCK_ACHIEVEMENTS} />
-              )}
-              {tab === 'assets' && <AssetsTab assets={MOCK_ASSETS} />}
-            </motion.div>
-          </AnimatePresence>
+        {/* Tab 内容（切 tab 淡入，不用 exit 避免快速切换卡死） */}
+        <div className="px-4 pt-4">
+          <motion.div
+            key={tab}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+          >
+            {tab === 'overview' && (
+              <OverviewTab
+                stats={MOCK_STATS}
+                recentPosts={MOCK_POSTS}
+                achievements={MOCK_ACHIEVEMENTS}
+                gifts={MOCK_GIFTS}
+              />
+            )}
+            {tab === 'stats' && <StatsTab stats={MOCK_STATS} />}
+            {tab === 'posts' && <PostsTab player={player} posts={MOCK_POSTS} />}
+            {tab === 'honors' && (
+              <HonorsTab gifts={MOCK_GIFTS} achievements={MOCK_ACHIEVEMENTS} />
+            )}
+            {tab === 'assets' && <AssetsTab assets={MOCK_ASSETS} />}
+          </motion.div>
         </div>
       </div>
     </div>
+  );
+}
+
+/** 更多菜单里的一行 */
+function MenuItem({
+  icon,
+  label,
+  onClick,
+  last,
+}: {
+  icon: IconName;
+  label: string;
+  onClick: () => void;
+  last?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center gap-2.5 px-4 py-3 text-sm text-white/90 transition active:bg-white/5 ${
+        last ? '' : 'border-b border-white/10'
+      }`}
+    >
+      <Icon name={icon} size={15} className="text-white/70" />
+      {label}
+    </button>
   );
 }
