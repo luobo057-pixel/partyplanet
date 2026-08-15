@@ -8,6 +8,7 @@ import type { NpcProfile } from '@/services/mocks/npcData';
 import { PlayerStrip } from './PlayerStrip';
 import { GameStage } from './GameStage';
 import { TruthOrDareGame } from './games/TruthOrDareGame';
+import { LiarsDiceGame } from './games/LiarsDiceGame';
 import { ChatOverlay, ChatInputBar } from './ChatOverlay';
 import { GiftPanel } from './GiftPanel';
 import { GiftFx, type GiftEffect } from './GiftFx';
@@ -240,6 +241,12 @@ export default function RoomPage() {
       <div className="relative flex flex-1 flex-col overflow-hidden">
         {room.isPlaying && room.gameType === 'truth-or-dare' ? (
           <TruthOrDareGame
+            players={room.players}
+            me={currentPlayer}
+            onExit={() => setPlaying(false)}
+          />
+        ) : room.isPlaying && room.gameType === 'liars-dice' ? (
+          <LiarsDiceGame
             players={room.players}
             me={currentPlayer}
             onExit={() => setPlaying(false)}

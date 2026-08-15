@@ -76,6 +76,23 @@ const ROOM_TEMPLATES: Array<{
     playerCount: 10,
   },
   {
+    name: 'Dice Kings Lounge',
+    gameType: 'liars-dice',
+    vibe: 'hot',
+    announcement: 'High-stakes bluffing — call the lie or lose a die!',
+    hostIdx: 2,
+    playerCount: 11,
+    isHot: true,
+  },
+  {
+    name: "Liar's Paradise",
+    gameType: 'liars-dice',
+    vibe: 'icebreak',
+    announcement: 'Chill dice table, beginners welcome',
+    hostIdx: 3,
+    playerCount: 8,
+  },
+  {
     name: 'Weekend Madness',
     gameType: 'quiz',
     vibe: 'hot',
@@ -131,14 +148,16 @@ export function getMockRoomById(id: RoomId): RoomWithHost | undefined {
 /** Game type → display label (English) */
 export const GAME_TYPE_LABELS: Record<GameType, string> = {
   'truth-or-dare': 'Truth or Dare',
+  'liars-dice': "Liar's Dice",
   quiz: 'Quiz',
   'who-is-spy': 'Who is Spy',
   none: 'Chat Only',
 };
 
-/** Game type → illustration asset (256px, from public/assets/pico) */
+/** Game type → illustration asset (from public/assets/pico) */
 export const GAME_TYPE_IMAGES: Record<GameType, string> = {
   'truth-or-dare': '/assets/pico/game-draw.png',
+  'liars-dice': '/assets/pico/game-dice.svg',
   quiz: '/assets/pico/game-mic.png',
   'who-is-spy': '/assets/pico/game-spy.png',
   none: '/assets/pico/gift-star-mic.png',

@@ -64,7 +64,7 @@ export type RoomId = string;
 export type RoomVibe = 'hot' | 'late-night' | 'icebreak' | 'competitive' | 'chill';
 
 /** Game types supported in a room */
-export type GameType = 'truth-or-dare' | 'quiz' | 'who-is-spy' | 'none';
+export type GameType = 'truth-or-dare' | 'liars-dice' | 'quiz' | 'who-is-spy' | 'none';
 
 export interface Room {
   id: RoomId;

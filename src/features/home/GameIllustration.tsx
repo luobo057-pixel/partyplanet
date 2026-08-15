@@ -79,6 +79,35 @@ function renderArt(gameType: GameType) {
         </g>
       );
 
+    case 'liars-dice':
+      // 大话骰：两枚斜放骰子 + 问号背面（吹牛的悬念感）
+      return (
+        <g stroke="white" strokeWidth="1.5" opacity="0.9">
+          {/* 背面骰子（问号） */}
+          <g transform="rotate(-12 78 56)">
+            <rect x="58" y="36" width="40" height="40" rx="9" fill="white" fillOpacity="0.12" />
+            <path
+              d="M74 50 q0 -5 5 -5 q5 0 5 4.5 q0 3.5 -4 5 l-1 3.5"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+            <circle cx="79" cy="65" r="1.8" fill="white" stroke="none" />
+          </g>
+          {/* 正面骰子（5点） */}
+          <g transform="rotate(10 40 78)">
+            <rect x="22" y="60" width="42" height="42" rx="10" fill="white" fillOpacity="0.2" />
+            <circle cx="33" cy="71" r="3.4" fill="white" stroke="none" />
+            <circle cx="53" cy="71" r="3.4" fill="white" stroke="none" />
+            <circle cx="43" cy="81" r="3.4" fill="white" stroke="none" />
+            <circle cx="33" cy="91" r="3.4" fill="white" stroke="none" />
+            <circle cx="53" cy="91" r="3.4" fill="white" stroke="none" />
+          </g>
+          {/* 散点 */}
+          <circle cx="112" cy="96" r="2.2" fill="white" stroke="none" opacity="0.55" />
+          <circle cx="20" cy="46" r="1.8" fill="white" stroke="none" opacity="0.5" />
+        </g>
+      );
+
     case 'quiz':
       // 抢答主题：灯泡 + 闪电 + 知识几何
       return (

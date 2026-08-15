@@ -19,6 +19,7 @@ interface GameEntry {
   gradient: string;
   glow: string;
   span: 'full' | 'half';
+  isNew?: boolean;
 }
 
 const GAME_ENTRIES: GameEntry[] = [
@@ -30,10 +31,18 @@ const GAME_ENTRIES: GameEntry[] = [
     span: 'full',
   },
   {
-    type: 'who-is-spy',
-    title: 'Who is Spy',
+    type: 'liars-dice',
+    title: "Liar's Dice",
     gradient: 'from-violet-500 to-purple-600',
     glow: 'shadow-[0_8px_24px_rgba(139,92,246,0.4)]',
+    span: 'half',
+    isNew: true,
+  },
+  {
+    type: 'who-is-spy',
+    title: 'Who is Spy',
+    gradient: 'from-indigo-500 to-violet-600',
+    glow: 'shadow-[0_8px_24px_rgba(99,102,241,0.4)]',
     span: 'half',
   },
   {
@@ -48,7 +57,7 @@ const GAME_ENTRIES: GameEntry[] = [
     title: 'Chat Room',
     gradient: 'from-emerald-500 to-teal-600',
     glow: 'shadow-[0_8px_24px_rgba(16,185,129,0.4)]',
-    span: 'full',
+    span: 'half',
   },
 ];
 
@@ -120,6 +129,13 @@ export default function HomePage() {
             >
               {/* SVG 几何插画（右上角装饰） */}
               <GameIllustration gameType={entry.type} variant={entry.span} />
+
+              {/* NEW 角标 */}
+              {entry.isNew && (
+                <span className="absolute right-3 top-3 rounded-full bg-white/95 px-2 py-0.5 text-micro font-bold uppercase tracking-wider text-violet-700">
+                  New
+                </span>
+              )}
 
               {/* 柔光 */}
               <div className="absolute -left-4 -bottom-4 h-20 w-20 rounded-full bg-white/10 blur-2xl" />

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#4C1D95"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.3" cy="0.25" r="0.9">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="256" height="256" fill="url(#bg)"/>
+  <rect width="256" height="256" fill="url(#glow)"/>
+  <!-- back die, tilted -->
+  <g transform="translate(108 58) rotate(-14)">
+    <rect x="0" y="0" width="86" height="86" rx="18" fill="#312E58" stroke="#8B87C2" stroke-width="4"/>
+    <circle cx="43" cy="43" r="14" fill="#8B87C2"/>
+    <text x="43" y="50" text-anchor="middle" font-size="21" fill="#4C4680" font-weight="bold" font-family="Arial">?</text>
+  </g>
+  <!-- front die, face 5 -->
+  <g transform="translate(52 104) rotate(9)">
+    <rect x="0" y="0" width="96" height="96" rx="20" fill="#FFFFFF" stroke="#E5E1FA" stroke-width="4"/>
+    <circle cx="26" cy="26" r="9" fill="#7C3AED"/>
+    <circle cx="70" cy="26" r="9" fill="#7C3AED"/>
+    <circle cx="48" cy="48" r="9" fill="#F43F5E"/>
+    <circle cx="26" cy="70" r="9" fill="#7C3AED"/>
+    <circle cx="70" cy="70" r="9" fill="#7C3AED"/>
+  </g>
+  <!-- sparkles -->
+  <circle cx="200" cy="52" r="5" fill="#FFFFFF" opacity="0.85"/>
+  <circle cx="216" cy="84" r="3.5" fill="#FFFFFF" opacity="0.6"/>
+  <circle cx="186" cy="30" r="3" fill="#FFFFFF" opacity="0.5"/>
+</svg>

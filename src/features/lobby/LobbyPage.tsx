@@ -22,6 +22,7 @@ type CategoryKey = 'all' | GameType;
 const CATEGORIES: { key: CategoryKey; label: string }[] = [
   { key: 'all', label: 'For You' },
   { key: 'truth-or-dare', label: 'Truth or Dare' },
+  { key: 'liars-dice', label: 'Dice' },
   { key: 'who-is-spy', label: 'Spy' },
   { key: 'quiz', label: 'Quiz' },
   { key: 'none', label: 'Chat' },

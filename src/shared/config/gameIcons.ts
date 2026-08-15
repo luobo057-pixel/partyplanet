@@ -7,6 +7,7 @@ import type { GameType } from '@/types';
  */
 export const GAME_ICON_MAP: Record<GameType, IconName> = {
   'truth-or-dare': 'dice',
+  'liars-dice': 'dice',
   quiz: 'brain',
   'who-is-spy': 'spy',
   none: 'chat',
