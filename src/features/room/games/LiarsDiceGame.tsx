@@ -35,6 +35,12 @@ interface SeatState {
   dice: number[];
 }
 
+/** Speech-bubble action attached to a player (like chat) */
+interface Bubble {
+  text: string;
+  kind: 'bid' | 'call';
+}
+
 interface LDState {
   phase: Phase;
   round: number;
@@ -47,6 +53,8 @@ interface LDState {
   opener: number;
   bid: Bid | null;
   history: string[];
+  /** latest action per player, rendered as avatar bubbles */
+  lastBy: Record<PlayerId, Bubble>;
   reveal: null | {
     bid: Bid;
     callerId: PlayerId;
@@ -81,6 +89,7 @@ function init(players: Player[], meId: PlayerId | null): LDState {
     opener: 0,
     bid: null,
     history: [],
+    lastBy: {},
     reveal: null,
     iWon: null,
   };
@@ -106,7 +115,7 @@ function reducer(s: LDState, a: Action): LDState {
             }
           : seat,
       );
-      return { ...s, phase: 'bidding', seats, turn: s.opener, bid: null, reveal: null };
+      return { ...s, phase: 'bidding', seats, turn: s.opener, bid: null, reveal: null, lastBy: {} };
     }
 
     case 'BID': {
@@ -116,6 +125,7 @@ function reducer(s: LDState, a: Action): LDState {
         ...s,
         bid,
         history: [...s.history.slice(-4), `${seat.id}|${a.count}× ${a.face}`],
+        lastBy: { ...s.lastBy, [seat.id]: { text: `${a.count}×${a.face}`, kind: 'bid' } },
         turn: nextAlive(s, s.turn),
       };
     }
@@ -143,6 +153,7 @@ function reducer(s: LDState, a: Action): LDState {
         phase: gameOver ? 'gameover' : 'reveal',
         seats,
         reveal: { bid: s.bid, callerId, actualCount, loserId },
+        lastBy: { ...s.lastBy, [callerId]: { text: 'LIE!', kind: 'call' } },
         iWon: gameOver ? npcAlive === 0 : s.iWon,
         opener: loserIdx >= 0 ? loserIdx : s.opener,
       };
@@ -250,30 +261,65 @@ export function LiarsDiceGame({ players, me, onExit }: Props) {
 
       {/* table */}
       <div className="relative flex flex-1 flex-col justify-center gap-4 px-4">
-        {/* opponents */}
-        <div className="flex flex-wrap justify-center gap-2">
+        {/* opponents — each with a live action bubble */}
+        <div className="flex flex-wrap justify-center gap-2 pt-7">
           {seatsWithPlayers
             .filter((x) => x.player.id !== me?.id)
             .map(({ seat, player }) => {
               const isTurn = seat.id === currentSeat?.seat.id && state.phase === 'bidding';
               const out = seat.dice.length === 0;
+              const bubble = state.lastBy[player.id];
+              const isLoser = state.reveal?.loserId === player.id && state.phase === 'reveal';
               return (
-                <div
-                  key={player.id}
-                  className={`flex items-center gap-2 rounded-2xl border px-2.5 py-1.5 transition ${
-                    out ? 'border-white/5 opacity-30' : isTurn ? 'border-violet-400/60 bg-violet-400/10' : 'border-white/10 bg-white/5'
-                  }`}
-                >
-                  <SimpleAvatar nickname={player.nickname} config={player.avatar} size={26} circle ring={isTurn ? 'active' : 'idle'} />
-                  <div className="flex flex-col">
-                    <span className="text-micro font-medium leading-tight">{player.nickname}</span>
-                    <div className="mt-0.5 flex gap-0.5">
-                      {Array.from({ length: START_DICE }).map((_, i) => (
+                <div key={player.id} className="relative">
+                  {/* speech bubble above the chip */}
+                  <AnimatePresence>
+                    {bubble && (
+                      <motion.div
+                        key={`${state.round}-${player.id}-${bubble.text}`}
+                        initial={{ opacity: 0, scale: 0.5, y: 8 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+                        className={`absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg px-2 py-1 text-micro font-bold shadow-lg ${
+                          bubble.kind === 'call'
+                            ? 'bg-gradient-to-r from-brand-500 to-pink-600 text-white'
+                            : 'bg-violet-400 text-night-900'
+                        } ${isLoser ? 'ring-2 ring-red-400' : ''}`}
+                      >
+                        {bubble.text}
+                        {/* tail */}
                         <span
-                          key={i}
-                          className={`h-1.5 w-1.5 rounded-full ${i < seat.dice.length ? 'bg-violet-300' : 'bg-white/15'}`}
+                          className={`absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 ${
+                            bubble.kind === 'call' ? 'bg-brand-500' : 'bg-violet-400'
+                          }`}
                         />
-                      ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div
+                    className={`flex items-center gap-2 rounded-2xl border px-2.5 py-1.5 transition ${
+                      out
+                        ? 'border-white/5 opacity-30'
+                        : isLoser
+                          ? 'border-red-400/70 bg-red-400/10'
+                          : isTurn
+                            ? 'border-violet-400/60 bg-violet-400/10'
+                            : 'border-white/10 bg-white/5'
+                    }`}
+                  >
+                    <SimpleAvatar nickname={player.nickname} config={player.avatar} size={26} circle ring={isTurn ? 'active' : 'idle'} />
+                    <div className="flex flex-col">
+                      <span className="text-micro font-medium leading-tight">{player.nickname}</span>
+                      <div className="mt-0.5 flex gap-0.5">
+                        {Array.from({ length: START_DICE }).map((_, i) => (
+                          <span
+                            key={i}
+                            className={`h-1.5 w-1.5 rounded-full ${i < seat.dice.length ? 'bg-violet-300' : 'bg-white/15'}`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -347,8 +393,31 @@ export function LiarsDiceGame({ players, me, onExit }: Props) {
           </AnimatePresence>
         </div>
 
-        {/* my dice */}
-        <div className="flex flex-col items-center gap-1.5">
+        {/* my dice — with my own action bubble */}
+        <div className="relative flex flex-col items-center gap-1.5">
+          <AnimatePresence>
+            {me && state.lastBy[me.id] && (
+              <motion.div
+                key={`${state.round}-me-${state.lastBy[me.id].text}`}
+                initial={{ opacity: 0, scale: 0.5, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+                className={`absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-bold shadow-lg ${
+                  state.lastBy[me.id].kind === 'call'
+                    ? 'bg-gradient-to-r from-brand-500 to-pink-600 text-white'
+                    : 'bg-violet-400 text-night-900'
+                }`}
+              >
+                {state.lastBy[me.id].text}
+                <span
+                  className={`absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 ${
+                    state.lastBy[me.id].kind === 'call' ? 'bg-brand-500' : 'bg-violet-400'
+                  }`}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
           <span className="text-micro text-white/40">Your dice</span>
           <div className="flex gap-1.5">
             {(seatsWithPlayers.find((x) => x.player.id === me?.id)?.seat.dice ?? []).map((d, i) => (
