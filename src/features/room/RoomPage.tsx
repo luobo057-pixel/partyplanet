@@ -209,6 +209,7 @@ export default function RoomPage() {
           isPlaying={room.isPlaying}
           roomName={room.name}
           isHost={isHost}
+          active={speakingPlayerId === null}
           onStartGame={() => setPlaying(true)}
         />
         <ChatOverlay

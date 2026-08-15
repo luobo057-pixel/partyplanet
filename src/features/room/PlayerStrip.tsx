@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useRef, useEffect } from 'react';
 import type { Player, PlayerId } from '@/types';
 import { SimpleAvatar } from '@/shared/components/SimpleAvatar';
@@ -6,10 +6,11 @@ import { SimpleAvatar } from '@/shared/components/SimpleAvatar';
 /**
  * Player strip — horizontal player list at the top of a room.
  *
- * - Compact, scrollable (8-20 players)
- * - Host carries a crown badge
- * - Speaker avatar scales up + highlight ring + name bubble
- * - Every avatar is tappable → opens player card (add friend)
+ * Layout-stability rules (prevents the stage below from jumping):
+ * - Fixed name-row height: speaking bubble and idle name render inside
+ *   the same h-[18px] row, swapped by opacity — never by height
+ * - Fixed button width so the strip never reflows horizontally
+ * - Speaking emphasis uses transform only (scale), which never affects layout
  */
 
 interface PlayerStripProps {
@@ -48,7 +49,7 @@ export function PlayerStrip({
           <button
             key={player.id}
             onClick={() => onSelectPlayer?.(player)}
-            className="flex shrink-0 flex-col items-center gap-1 transition active:scale-95"
+            className="flex w-[52px] shrink-0 flex-col items-center gap-1 transition active:scale-95"
           >
             <div className="relative">
               <motion.div
@@ -62,7 +63,7 @@ export function PlayerStrip({
                 <SimpleAvatar
                   nickname={player.nickname}
                   config={player.avatar}
-                  size={isSpeaking ? 52 : 44}
+                  size={44}
                   circle
                   ring={isSpeaking ? 'active' : 'idle'}
                   isHost={isHost}
@@ -74,23 +75,29 @@ export function PlayerStrip({
                 </span>
               )}
             </div>
-            <AnimatePresence>
-              {isSpeaking && (
+
+            {/* Fixed-height name row — bubble/idle name swap by opacity only */}
+            <div className="flex h-[18px] w-full items-center justify-center">
+              {isSpeaking ? (
                 <motion.span
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="max-w-[60px] truncate rounded bg-white/10 px-1.5 py-0.5 text-micro"
+                  key="bubble"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="max-w-full truncate rounded bg-white/10 px-1.5 py-0.5 text-micro leading-none"
                 >
                   {player.nickname}
                 </motion.span>
+              ) : (
+                <motion.span
+                  key="name"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="max-w-full truncate text-micro leading-none text-white/40"
+                >
+                  {isMe ? 'Me' : player.nickname}
+                </motion.span>
               )}
-            </AnimatePresence>
-            {!isSpeaking && (
-              <span className="max-w-[52px] truncate text-micro text-white/40">
-                {isMe ? 'Me' : player.nickname}
-              </span>
-            )}
+            </div>
           </button>
         );
       })}
