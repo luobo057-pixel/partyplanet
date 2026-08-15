@@ -90,11 +90,13 @@ interface ChatInputBarProps {
   onSend: () => void;
   /** Quick emoji tap — sends immediately */
   onEmoji?: (emoji: string) => void;
+  /** Open the gift panel (button sits left of send) */
+  onGift?: () => void;
 }
 
 const QUICK_EMOJIS = ['😀', '😂', '🥰', '🎉', '👍', '🔥', '😱', '💔'];
 
-export function ChatInputBar({ value, onChange, onSend, onEmoji }: ChatInputBarProps) {
+export function ChatInputBar({ value, onChange, onSend, onEmoji, onGift }: ChatInputBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Note: no auto-focus on mount — mobile keyboards shouldn't pop up
@@ -132,6 +134,13 @@ export function ChatInputBar({ value, onChange, onSend, onEmoji }: ChatInputBarP
           placeholder="Say something..."
           className="flex-1 rounded-full bg-white/10 px-4 py-2 text-sm outline-none placeholder:text-white/40 focus:bg-white/10"
         />
+        {/* Gift — opens panel (left of send) */}
+        <button
+          onClick={onGift}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/70 transition active:scale-90"
+        >
+          <Icon name="gift" size={17} />
+        </button>
         <button
           onClick={handleSend}
           disabled={!value.trim()}

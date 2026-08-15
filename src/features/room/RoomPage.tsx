@@ -8,6 +8,9 @@ import type { NpcProfile } from '@/services/mocks/npcData';
 import { PlayerStrip } from './PlayerStrip';
 import { GameStage } from './GameStage';
 import { ChatOverlay, ChatInputBar } from './ChatOverlay';
+import { GiftPanel } from './GiftPanel';
+import { GiftFx, type GiftEffect } from './GiftFx';
+import type { GiftItem } from './giftCatalog';
 import { PlayerCardSheet } from '@/features/social/PlayerCardSheet';
 import { Icon } from '@/shared/components/Icon';
 import type { Player } from '@/types';
@@ -19,6 +22,8 @@ export default function RoomPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const currentPlayer = usePlayerStore((s) => s.player);
+  const coins = usePlayerStore((s) => s.player?.coins ?? 0);
+  const spendCoins = usePlayerStore((s) => s.spendCoins);
   const {
     room,
     messages,
@@ -32,6 +37,8 @@ export default function RoomPage() {
 
   const [draft, setDraft] = useState('');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [giftOpen, setGiftOpen] = useState(false);
+  const [giftFx, setGiftFx] = useState<GiftEffect | null>(null);
 
   /** All pending timeouts (speaking reset etc.) — cleared on unmount */
   const pendingTimers = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
@@ -172,6 +179,25 @@ export default function RoomPage() {
     highlightMe();
   };
 
+  /** Send a gift: pay, post to chat, trigger tier effect */
+  const handleGiftSend = (gift: GiftItem) => {
+    if (!currentPlayer || !room || !spendCoins(gift.price)) return;
+    addMessage({
+      id: makeMessageId(),
+      roomId: room.id,
+      senderId: currentPlayer.id,
+      text: `${gift.emoji} ${gift.name}`,
+      createdAt: Date.now(),
+    });
+    setGiftFx({
+      id: Date.now(),
+      gift,
+      fromNickname: currentPlayer.nickname,
+    });
+    highlightMe();
+    setGiftOpen(false);
+  };
+
   const handleLeave = () => {
     leaveRoom();
     navigate('/lobby');
@@ -230,7 +256,21 @@ export default function RoomPage() {
       </div>
 
       {/* Input bar */}
-      <ChatInputBar value={draft} onChange={setDraft} onSend={handleSend} onEmoji={handleEmoji} />
+      <ChatInputBar
+        value={draft}
+        onChange={setDraft}
+        onSend={handleSend}
+        onEmoji={handleEmoji}
+        onGift={() => setGiftOpen(true)}
+      />
+
+      {/* Gift panel (input bar gift button) */}
+      {giftOpen && (
+        <GiftPanel coins={coins} onClose={() => setGiftOpen(false)} onSend={handleGiftSend} />
+      )}
+
+      {/* Gift send effect (tier-driven) */}
+      {giftFx && <GiftFx effect={giftFx} onDone={() => setGiftFx(null)} />}
 
       {/* Player card sheet (avatar tap → add friend) */}
       {selectedPlayer && (

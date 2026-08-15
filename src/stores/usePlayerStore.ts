@@ -48,6 +48,8 @@ interface PlayerStore {
   /** 更新当前玩家信息（编辑昵称 / Avatar） */
   updateProfile: (patch: Partial<Pick<Player, 'nickname' | 'avatar' | 'bio'>>) => void;
   setPlayer: (player: Player) => void;
+  /** Deduct coins; false when balance insufficient */
+  spendCoins: (amount: number) => boolean;
 }
 
 export const usePlayerStore = create<PlayerStore>()(
@@ -67,6 +69,13 @@ export const usePlayerStore = create<PlayerStore>()(
         set({ player: { ...current, ...patch } });
       },
       setPlayer: (player) => set({ player }),
+      spendCoins: (amount) => {
+        const current = get().player;
+        const balance = current?.coins ?? 0;
+        if (!current || balance < amount) return false;
+        set({ player: { ...current, coins: balance - amount } });
+        return true;
+      },
     }),
     {
       name: 'partyplanet-player',
