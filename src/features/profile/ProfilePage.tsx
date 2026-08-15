@@ -79,13 +79,13 @@ export default function ProfilePage() {
         <ProfileHeader player={player} stats={MOCK_STATS} />
 
         {/* Tab bar：纯文字 + 下划线指示器 */}
-        <div className="sticky top-0 z-10 mt-4 border-b border-white/10 bg-night-900/90 backdrop-blur">
+        <div className="sticky top-0 z-10 mt-2 border-b border-white/10 bg-night-900/90 backdrop-blur">
           <div className="no-scrollbar flex overflow-x-auto">
             {TABS.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`relative flex-1 shrink-0 px-2 py-2.5 text-sm font-medium transition ${
+                className={`relative flex-1 shrink-0 px-2 py-3.5 text-sm font-medium transition ${
                   tab === t.key ? 'text-white' : 'text-white/40'
                 }`}
               >
@@ -102,7 +102,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Tab 内容（切 tab 淡入，不用 exit 避免快速切换卡死） */}
-        <div className="px-4 pt-4">
+        <div className="px-5 pt-6">
           <motion.div
             key={tab}
             initial={{ opacity: 0 }}

@@ -3,6 +3,13 @@ import { GAME_TYPE_LABELS } from '@/services/mocks/roomData';
 import { GAME_ICON_MAP } from '@/shared/config/gameIcons';
 import { Icon } from '@/shared/components/Icon';
 
+/**
+ * Overview tab — curated highlights, one concern per section.
+ *
+ * Lifetime Games/Wins live in the page hero; this tab leads with the
+ * player's best game, then achievements, latest post and top gift.
+ */
+
 interface OverviewTabProps {
   stats: GameStat[];
   recentPosts: Post[];
@@ -10,134 +17,108 @@ interface OverviewTabProps {
   gifts: Gift[];
 }
 
-/**
- * Overview tab — a summary card combining key info from other tabs.
- */
 export function OverviewTab({
   stats,
   recentPosts,
   achievements,
   gifts,
 }: OverviewTabProps) {
-  const totalGames = stats.reduce((s, g) => s + g.totalGames, 0);
-  const totalWins = stats.reduce((s, g) => s + g.wins, 0);
-  const earnedAchievements = achievements.filter((a) => a.earnedAt);
+  const earned = achievements.filter((a) => a.earnedAt);
   const topGift = [...gifts].sort((a, b) => b.stars - a.stars)[0];
+  const bestGame = [...stats].sort((a, b) => b.rankPoints - a.rankPoints)[0];
 
   return (
-    <div className="space-y-3">
-      {/* Stats summary */}
-      <section className="glass p-4">
-        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
-          <Icon name="trophy" size={16} className="text-amber-400" />
-          Highlights
-        </h3>
-        <div className="grid grid-cols-3 gap-2">
-          <Stat label="Games" value={totalGames} />
-          <Stat label="Wins" value={totalWins} />
-          <Stat
-            label="Win Rate"
-            value={`${totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0}%`}
-          />
-        </div>
-      </section>
-
-      {/* Best game */}
-      <section className="glass p-4">
-        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
-          <Icon name="game" size={16} className="text-brand-400" />
-          Top Game
-        </h3>
-        {stats.length > 0 && (
-          <div className="flex items-center gap-3">
+    <div className="space-y-6">
+      {/* Top game */}
+      {bestGame && (
+        <Section title="Top Game" icon="game" iconClass="text-brand-400">
+          <div className="flex items-center gap-3.5 px-1 py-1">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5">
-              <Icon name={GAME_ICON_MAP[stats[0].gameType]} size={24} className="text-white/90" />
+              <Icon name={GAME_ICON_MAP[bestGame.gameType]} size={24} className="text-white/90" />
             </div>
             <div className="flex-1">
-              <p className="font-medium">{GAME_TYPE_LABELS[stats[0].gameType]}</p>
-              <p className="text-xs text-white/40">
-                {stats[0].tier} · {stats[0].rankPoints} RP
+              <p className="font-medium">{GAME_TYPE_LABELS[bestGame.gameType]}</p>
+              <p className="mt-0.5 text-xs text-white/40">
+                {bestGame.totalGames} games · {bestGame.rankPoints} RP
               </p>
             </div>
-            <span className="rounded-md bg-amber-400/20 px-2 py-0.5 text-xs font-medium text-amber-300">
-              {stats[0].tier}
+            <span className="rounded-md bg-amber-400/20 px-2 py-1 text-micro font-semibold text-amber-300">
+              {bestGame.tier}
             </span>
           </div>
-        )}
-      </section>
+        </Section>
+      )}
 
-      {/* Recent post */}
-      <section className="glass p-4">
-        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
-          <Icon name="image" size={16} className="text-sky-400" />
-          Latest Post
-        </h3>
-        {recentPosts[0] ? (
-          <div className="rounded-xl bg-white/5 p-3">
+      {/* Achievements */}
+      {earned.length > 0 && (
+        <Section title="Achievements" icon="star" iconClass="text-violet-400">
+          <div className="flex flex-wrap gap-2 px-1 py-1.5">
+            {earned.slice(0, 4).map((a) => (
+              <span
+                key={a.id}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium ${RARITY_STYLES[a.rarity]}`}
+              >
+                {a.emoji} {a.title}
+              </span>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* Latest post */}
+      {recentPosts[0] && (
+        <Section title="Latest Post" icon="image" iconClass="text-sky-400">
+          <div className="rounded-xl bg-white/5 p-4">
             {recentPosts[0].emoji && (
-              <span className="mb-1 block text-2xl">{recentPosts[0].emoji}</span>
+              <span className="mb-1.5 block text-2xl">{recentPosts[0].emoji}</span>
             )}
-            <p className="text-sm text-white/90">{recentPosts[0].text}</p>
-            <p className="mt-2 text-xs text-white/40">
-              {formatDate(recentPosts[0].createdAt)} · ❤ {recentPosts[0].likes}
+            <p className="text-sm leading-relaxed text-white/90">{recentPosts[0].text}</p>
+            <p className="mt-2.5 text-micro text-white/40">
+              {formatDate(recentPosts[0].createdAt)} · {recentPosts[0].likes} likes
             </p>
           </div>
-        ) : (
-          <EmptyHint text="No posts yet" />
-        )}
-      </section>
+        </Section>
+      )}
 
-      {/* Featured achievement */}
-      <section className="glass p-4">
-        <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
-          <Icon name="star" size={16} className="text-violet-400" />
-          Featured Achievement
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {earnedAchievements.slice(0, 3).map((a) => (
-            <span
-              key={a.id}
-              className={`rounded-full px-2.5 py-1 text-xs font-medium ${RARITY_STYLES[a.rarity]}`}
-            >
-              {a.title}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* Gift highlight */}
+      {/* Top gift */}
       {topGift && (
-        <section className="glass p-4">
-          <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-white/90">
-            <Icon name="gift" size={16} className="text-rose-400" />
-            Top Gift
-          </h3>
-          <div className="flex items-center gap-3">
+        <Section title="Top Gift" icon="gift" iconClass="text-rose-400">
+          <div className="flex items-center gap-3.5 px-1 py-1">
             <span className="text-4xl">{topGift.emoji}</span>
             <div className="flex-1">
               <p className="font-medium">{topGift.name}</p>
-              <p className="text-xs text-white/40">
-                ×{topGift.count} · {topGift.stars} stars
+              <p className="mt-0.5 text-xs text-white/40">
+                ×{topGift.count} · {topGift.stars.toLocaleString()} stars
               </p>
             </div>
           </div>
-        </section>
+        </Section>
       )}
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: number | string }) {
+/** Section wrapper — consistent title + card rhythm */
+function Section({
+  title,
+  icon,
+  iconClass,
+  children,
+}: {
+  title: string;
+  icon: 'game' | 'star' | 'image' | 'gift';
+  iconClass: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col items-center rounded-xl bg-white/5 py-3">
-      <span className="text-lg font-bold text-brand-400">{value}</span>
-      <span className="text-xs text-white/40">{label}</span>
-    </div>
+    <section>
+      <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/40">
+        <Icon name={icon} size={14} className={iconClass} />
+        {title}
+      </h3>
+      {children}
+    </section>
   );
-}
-
-function EmptyHint({ text }: { text: string }) {
-  return <p className="py-3 text-center text-sm italic text-white/40">{text}</p>;
 }
 
 export const RARITY_STYLES: Record<string, string> = {
@@ -148,12 +129,8 @@ export const RARITY_STYLES: Record<string, string> = {
 };
 
 function formatDate(iso: string): string {
-  const d = new Date(iso);
-  const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  const diffH = Math.floor(diffMs / 3600000);
+  const diffH = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
   if (diffH < 1) return 'just now';
   if (diffH < 24) return `${diffH}h ago`;
-  const diffD = Math.floor(diffH / 24);
-  return `${diffD}d ago`;
+  return `${Math.floor(diffH / 24)}d ago`;
 }
