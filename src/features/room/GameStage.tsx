@@ -33,7 +33,7 @@ export function GameStage({
   onStartGame,
 }: GameStageProps) {
   if (isPlaying) {
-    return <StagePlaying gameType={gameType} active={active} />;
+    return <StagePlaying />;
   }
 
   return (
@@ -81,23 +81,15 @@ export function GameStage({
   );
 }
 
-function StagePlaying({ gameType, active }: { gameType: GameType; active: boolean }) {
+/**
+ * Playing state — clean stage, placeholder is gone for good.
+ * The real game canvas will mount here later; until then only the
+ * ambient background remains, chat owns the visual.
+ */
+function StagePlaying() {
   return (
-    <div className="relative mx-3 flex flex-1 flex-col items-center justify-center overflow-hidden rounded-3xl border border-brand-500/20 bg-gradient-to-b from-brand-500/10 to-night-800/60">
+    <div className="relative mx-3 flex flex-1 overflow-hidden rounded-3xl border border-brand-500/20 bg-gradient-to-b from-brand-500/10 to-night-800/60">
       <BackgroundGlow active />
-      <motion.div
-        animate={{ opacity: active ? 1 : 0 }}
-        transition={{ duration: 0.25 }}
-        className="relative flex flex-col items-center gap-2"
-      >
-        <div className="text-white">
-          <Icon name={GAME_ICON_MAP[gameType]} size={52} strokeWidth={1.8} />
-        </div>
-        <p className="text-sm font-medium text-brand-300">
-          {GAME_TYPE_LABELS[gameType]} · In Progress
-        </p>
-        <p className="text-xs text-white/40">Game UI coming in stage 4</p>
-      </motion.div>
     </div>
   );
 }
