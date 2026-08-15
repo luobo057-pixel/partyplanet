@@ -9,6 +9,7 @@ import { PlayerStrip, type PlayerGameStatus } from './PlayerStrip';
 import { GameStage } from './GameStage';
 import { TruthOrDareGame } from './games/TruthOrDareGame';
 import { LiarsDiceGame } from './games/LiarsDiceGame';
+import { WhoIsSpyGame } from './games/WhoIsSpyGame';
 import { ChatOverlay, ChatInputBar } from './ChatOverlay';
 import { GiftPanel } from './GiftPanel';
 import { GiftFx, type GiftEffect } from './GiftFx';
@@ -249,6 +250,13 @@ export default function RoomPage() {
           />
         ) : room.isPlaying && room.gameType === 'liars-dice' ? (
           <LiarsDiceGame
+            players={room.players}
+            me={currentPlayer}
+            onExit={() => setPlaying(false)}
+            onStatus={setGameStatus}
+          />
+        ) : room.isPlaying && room.gameType === 'who-is-spy' ? (
+          <WhoIsSpyGame
             players={room.players}
             me={currentPlayer}
             onExit={() => setPlaying(false)}
