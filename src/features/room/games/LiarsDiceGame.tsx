@@ -1,8 +1,8 @@
 import { useEffect, useReducer, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Player, PlayerId } from '@/types';
-import { SimpleAvatar } from '@/shared/components/SimpleAvatar';
 import { Icon } from '@/shared/components/Icon';
+import type { PlayerGameStatus } from '../PlayerStrip';
 import { Die } from './Die';
 
 /**
@@ -175,9 +175,11 @@ interface Props {
   players: Player[];
   me: Player | null;
   onExit: () => void;
+  /** Report live seat status so the top player strip can render it */
+  onStatus?: (m: Map<PlayerId, PlayerGameStatus> | null) => void;
 }
 
-export function LiarsDiceGame({ players, me, onExit }: Props) {
+export function LiarsDiceGame({ players, me, onExit, onStatus }: Props) {
   const [state, dispatch] = useReducer(
     reducer,
     { players: players, meId: me?.id ?? null },
@@ -239,6 +241,25 @@ export function LiarsDiceGame({ players, me, onExit }: Props) {
 
   const callLie = () => dispatch({ type: 'CALL' });
 
+  /** Push seat status up — the top strip renders dots/bubbles/turn ring */
+  useEffect(() => {
+    if (!onStatus) return;
+    const map = new Map<PlayerId, PlayerGameStatus>();
+    for (const seat of state.seats) {
+      const bubble = state.lastBy[seat.id];
+      map.set(seat.id, {
+        diceLeft: seat.dice.length,
+        totalDice: START_DICE,
+        isTurn: state.phase === 'bidding' && seat.id === currentSeat?.seat.id,
+        bubble: bubble ? { text: bubble.text, kind: bubble.kind } : undefined,
+        isLoser: state.phase === 'reveal' && state.reveal?.loserId === seat.id,
+      });
+    }
+    onStatus(map);
+  }, [state, currentSeat, onStatus]);
+
+  useEffect(() => () => onStatus?.(null), [onStatus]);
+
   return (
     <div className="relative mx-3 flex flex-1 flex-col overflow-hidden rounded-3xl border border-violet-500/25 bg-gradient-to-b from-violet-500/10 to-night-800/60">
       {/* glow */}
@@ -261,72 +282,6 @@ export function LiarsDiceGame({ players, me, onExit }: Props) {
 
       {/* table */}
       <div className="relative flex flex-1 flex-col justify-center gap-4 px-4">
-        {/* opponents — each with a live action bubble */}
-        <div className="flex flex-wrap justify-center gap-2 pt-7">
-          {seatsWithPlayers
-            .filter((x) => x.player.id !== me?.id)
-            .map(({ seat, player }) => {
-              const isTurn = seat.id === currentSeat?.seat.id && state.phase === 'bidding';
-              const out = seat.dice.length === 0;
-              const bubble = state.lastBy[player.id];
-              const isLoser = state.reveal?.loserId === player.id && state.phase === 'reveal';
-              return (
-                <div key={player.id} className="relative">
-                  {/* speech bubble above the chip */}
-                  <AnimatePresence>
-                    {bubble && (
-                      <motion.div
-                        key={`${state.round}-${player.id}-${bubble.text}`}
-                        initial={{ opacity: 0, scale: 0.5, y: 8 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 22 }}
-                        className={`absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg px-2 py-1 text-micro font-bold shadow-lg ${
-                          bubble.kind === 'call'
-                            ? 'bg-gradient-to-r from-brand-500 to-pink-600 text-white'
-                            : 'bg-violet-400 text-night-900'
-                        } ${isLoser ? 'ring-2 ring-red-400' : ''}`}
-                      >
-                        {bubble.text}
-                        {/* tail */}
-                        <span
-                          className={`absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 ${
-                            bubble.kind === 'call' ? 'bg-brand-500' : 'bg-violet-400'
-                          }`}
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  <div
-                    className={`flex items-center gap-2 rounded-2xl border px-2.5 py-1.5 transition ${
-                      out
-                        ? 'border-white/5 opacity-30'
-                        : isLoser
-                          ? 'border-red-400/70 bg-red-400/10'
-                          : isTurn
-                            ? 'border-violet-400/60 bg-violet-400/10'
-                            : 'border-white/10 bg-white/5'
-                    }`}
-                  >
-                    <SimpleAvatar nickname={player.nickname} config={player.avatar} size={26} circle ring={isTurn ? 'active' : 'idle'} />
-                    <div className="flex flex-col">
-                      <span className="text-micro font-medium leading-tight">{player.nickname}</span>
-                      <div className="mt-0.5 flex gap-0.5">
-                        {Array.from({ length: START_DICE }).map((_, i) => (
-                          <span
-                            key={i}
-                            className={`h-1.5 w-1.5 rounded-full ${i < seat.dice.length ? 'bg-violet-300' : 'bg-white/15'}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-        </div>
-
         {/* center: current bid / phase message */}
         <div className="flex min-h-[92px] flex-col items-center justify-center">
           <AnimatePresence mode="wait">
@@ -395,29 +350,6 @@ export function LiarsDiceGame({ players, me, onExit }: Props) {
 
         {/* my dice — with my own action bubble */}
         <div className="relative flex flex-col items-center gap-1.5">
-          <AnimatePresence>
-            {me && state.lastBy[me.id] && (
-              <motion.div
-                key={`${state.round}-me-${state.lastBy[me.id].text}`}
-                initial={{ opacity: 0, scale: 0.5, y: 8 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 22 }}
-                className={`absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-bold shadow-lg ${
-                  state.lastBy[me.id].kind === 'call'
-                    ? 'bg-gradient-to-r from-brand-500 to-pink-600 text-white'
-                    : 'bg-violet-400 text-night-900'
-                }`}
-              >
-                {state.lastBy[me.id].text}
-                <span
-                  className={`absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 ${
-                    state.lastBy[me.id].kind === 'call' ? 'bg-brand-500' : 'bg-violet-400'
-                  }`}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
           <span className="text-micro text-white/40">Your dice</span>
           <div className="flex gap-1.5">
             {(seatsWithPlayers.find((x) => x.player.id === me?.id)?.seat.dice ?? []).map((d, i) => (

@@ -5,7 +5,7 @@ import { useRoomStore, makeMessageId } from '@/stores/useRoomStore';
 import { getMockRoomById } from '@/services/mocks/roomData';
 import { randomDialogue } from '@/services/mocks/npcDialogue';
 import type { NpcProfile } from '@/services/mocks/npcData';
-import { PlayerStrip } from './PlayerStrip';
+import { PlayerStrip, type PlayerGameStatus } from './PlayerStrip';
 import { GameStage } from './GameStage';
 import { TruthOrDareGame } from './games/TruthOrDareGame';
 import { LiarsDiceGame } from './games/LiarsDiceGame';
@@ -15,7 +15,7 @@ import { GiftFx, type GiftEffect } from './GiftFx';
 import type { GiftItem } from './giftCatalog';
 import { PlayerCardSheet } from '@/features/social/PlayerCardSheet';
 import { Icon } from '@/shared/components/Icon';
-import type { Player } from '@/types';
+import type { Player, PlayerId } from '@/types';
 
 /**
  * Room page (core scene) — game-center layout for big rooms.
@@ -38,6 +38,7 @@ export default function RoomPage() {
   } = useRoomStore();
 
   const [draft, setDraft] = useState('');
+  const [gameStatus, setGameStatus] = useState<Map<PlayerId, PlayerGameStatus> | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [giftOpen, setGiftOpen] = useState(false);
   const [giftFx, setGiftFx] = useState<GiftEffect | null>(null);
@@ -235,6 +236,7 @@ export default function RoomPage() {
         currentUserId={currentPlayer?.id ?? null}
         speakingPlayerId={speakingPlayerId}
         onSelectPlayer={(p) => setSelectedPlayer(p)}
+        gameStatus={gameStatus}
       />
 
       {/* Game stage + chat overlay */}
@@ -250,6 +252,7 @@ export default function RoomPage() {
             players={room.players}
             me={currentPlayer}
             onExit={() => setPlaying(false)}
+            onStatus={setGameStatus}
           />
         ) : (
           <GameStage
@@ -264,6 +267,10 @@ export default function RoomPage() {
             onStartGame={() => setPlaying(true)}
           />
         )}
+
+        {/* Reserved strip for compact chat bubbles while a game runs —
+            keeps the overlay off the game's action bar / dice row */}
+        {room.isPlaying && <div className="h-20 shrink-0" />}
         <ChatOverlay
           messages={messages}
           playersById={playersById}

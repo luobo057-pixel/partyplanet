@@ -32,7 +32,7 @@ export function ChatOverlay({ messages, playersById, currentUserId, compact }: C
   return (
     <div
       className={`pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end gap-1.5 px-4 pb-3 ${
-        compact ? 'opacity-80' : ''
+        compact ? 'max-h-20 overflow-hidden opacity-80' : ''
       }`}
     >
       <AnimatePresence initial={false}>
@@ -60,22 +60,32 @@ export function ChatOverlay({ messages, playersById, currentUserId, compact }: C
                 />
               )}
               <div
-                className={`max-w-[70%] rounded-2xl px-3 py-1.5 backdrop-blur-sm ${
+                className={`max-w-[70%] rounded-2xl backdrop-blur-sm ${
                   isMe ? 'bg-brand-500/90 text-white' : 'bg-night-700/80 text-white/90'
-                } ${big ? 'px-3.5 py-2' : ''}`}
+                } ${compact ? 'px-2.5 py-1' : 'px-3 py-1.5'} ${big && !compact ? 'px-3.5 py-2' : ''}`}
               >
-                {!isMe && sender && (
+                {!isMe && sender && !compact && (
                   <p className="mb-0.5 text-micro font-medium text-white/40">
                     {sender.nickname}
                     {time && <span className="ml-1 text-white/20">{time}</span>}
                   </p>
                 )}
-                {big ? (
+                {big && !compact ? (
                   <p className="text-[28px] leading-normal">{msg.text}</p>
                 ) : (
-                  <p className="break-words line-clamp-3 text-sm leading-snug">{msg.text}</p>
+                  <p
+                    className={`break-words leading-snug ${
+                      compact ? 'text-xs line-clamp-1' : 'text-sm line-clamp-3'
+                    }`}
+                  >
+                    {/* compact: nickname inline so bubbles stay one line over the game */}
+                    {compact && !isMe && sender && (
+                      <span className="font-medium text-white/40">{sender.nickname}: </span>
+                    )}
+                    {msg.text}
+                  </p>
                 )}
-                {isMe && time && (
+                {isMe && time && !compact && (
                   <p className="mt-0.5 text-right text-micro text-white/40">{time}</p>
                 )}
               </div>

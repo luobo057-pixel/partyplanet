@@ -13,6 +13,18 @@ import { SimpleAvatar } from '@/shared/components/SimpleAvatar';
  * - Speaking emphasis uses transform only (scale), which never affects layout
  */
 
+/** Live per-player game state shown on the strip while a game runs */
+export interface PlayerGameStatus {
+  /** remaining dice; 0 = eliminated */
+  diceLeft: number;
+  totalDice: number;
+  /** currently acting in the game */
+  isTurn: boolean;
+  /** latest action bubble (bid / call) */
+  bubble?: { text: string; kind: 'bid' | 'call' };
+  isLoser?: boolean;
+}
+
 interface PlayerStripProps {
   players: Player[];
   hostId: PlayerId;
@@ -20,6 +32,8 @@ interface PlayerStripProps {
   speakingPlayerId: PlayerId | null;
   /** Tap an avatar to open that player's card */
   onSelectPlayer?: (player: Player) => void;
+  /** When set, the strip renders game state (dots/bubble/turn ring) */
+  gameStatus?: Map<PlayerId, PlayerGameStatus> | null;
 }
 
 export function PlayerStrip({
@@ -28,6 +42,7 @@ export function PlayerStrip({
   currentUserId,
   speakingPlayerId,
   onSelectPlayer,
+  gameStatus,
 }: PlayerStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -44,12 +59,16 @@ export function PlayerStrip({
         const isHost = player.id === hostId;
         const isMe = player.id === currentUserId;
         const isSpeaking = player.id === speakingPlayerId;
+        const gs = gameStatus?.get(player.id);
+        const isOut = !!gs && gs.diceLeft === 0;
 
         return (
           <button
             key={player.id}
             onClick={() => onSelectPlayer?.(player)}
-            className="flex w-[52px] shrink-0 flex-col items-center gap-1 transition active:scale-95"
+            className={`flex w-[52px] shrink-0 flex-col items-center gap-1 transition active:scale-95 ${
+              isOut ? 'opacity-40' : ''
+            }`}
           >
             <div className="relative">
               <motion.div
@@ -65,8 +84,9 @@ export function PlayerStrip({
                   config={player.avatar}
                   size={44}
                   circle
-                  ring={isSpeaking ? 'active' : 'idle'}
+                  ring={isSpeaking || gs?.isTurn ? 'active' : 'idle'}
                   isHost={isHost}
+                  className={gs?.isLoser ? 'rounded-full ring-2 ring-red-400' : ''}
                 />
               </motion.div>
               {isMe && (
@@ -76,9 +96,34 @@ export function PlayerStrip({
               )}
             </div>
 
-            {/* Fixed-height name row — bubble/idle name swap by opacity only */}
+            {/* Fixed-height name row — game bubble / dice dots / speaking
+                bubble / idle name swap here without changing row height */}
             <div className="flex h-[18px] w-full items-center justify-center">
-              {isSpeaking ? (
+              {gs?.bubble ? (
+                <motion.span
+                  key={`act-${gs.bubble.text}-${gs.bubble.kind}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className={`max-w-full truncate rounded px-1.5 py-0.5 text-micro font-bold leading-none ${
+                    gs.bubble.kind === 'call'
+                      ? 'bg-gradient-to-r from-brand-500 to-pink-600 text-white'
+                      : 'bg-violet-400 text-night-900'
+                  }`}
+                >
+                  {gs.bubble.text}
+                </motion.span>
+              ) : gs ? (
+                <span key="dice" className="flex gap-0.5">
+                  {Array.from({ length: gs.totalDice }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        i < gs.diceLeft ? 'bg-violet-300' : 'bg-white/15'
+                      }`}
+                    />
+                  ))}
+                </span>
+              ) : isSpeaking ? (
                 <motion.span
                   key="bubble"
                   initial={{ opacity: 0 }}
