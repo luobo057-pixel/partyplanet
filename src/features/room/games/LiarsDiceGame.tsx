@@ -198,6 +198,19 @@ export function LiarsDiceGame({ players, me, onExit, onStatus }: Props) {
   const [draftCount, setDraftCount] = useState(1);
   const [draftFace, setDraftFace] = useState(2);
 
+  /** Keep the draft a legal raise: the picker floors itself against the
+   *  current bid (vs 2×5 → minimum 2×6 or 3×any), so combos like 1×5
+   *  can't even be dialled. Idempotent — safe on every dep change. */
+  useEffect(() => {
+    const bid = state.bid;
+    if (!bid) return;
+    const minCount = bid.face === 6 ? bid.count + 1 : bid.count;
+    setDraftCount((c) => Math.max(c, minCount));
+    setDraftFace((f) =>
+      draftCount > bid.count ? f : f > bid.face ? f : bid.face < 6 ? bid.face + 1 : f,
+    );
+  }, [state.bid?.count, state.bid?.face, draftCount]);
+
   /** Phase driver: roll timing, NPC decisions, reveal pacing */
   useEffect(() => {
     const { phase, turn, seats } = state;
@@ -233,6 +246,15 @@ export function LiarsDiceGame({ players, me, onExit, onStatus }: Props) {
     const { count: pc, face: pf } = state.bid;
     return count > pc || (count === pc && face > pf);
   };
+
+  /** Picker bounds derived from the current bid */
+  const minCount = !state.bid
+    ? 1
+    : state.bid.face === 6
+      ? state.bid.count + 1
+      : state.bid.count;
+  const faceLegal = (f: number) =>
+    !state.bid || draftCount > state.bid.count || f > state.bid.face;
 
   const placeBid = () => {
     if (!legalBid(draftCount, draftFace)) return;
@@ -402,27 +424,51 @@ export function LiarsDiceGame({ players, me, onExit, onStatus }: Props) {
               exit={{ opacity: 0, y: 12 }}
               className="rounded-2xl border border-white/10 bg-night-700/80 p-3"
             >
-              {/* face picker */}
+              {/* reference: what you must beat */}
+              {state.bid && (
+                <div className="mb-2 flex justify-center">
+                  <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-micro text-white/50">
+                    Beat{' '}
+                    <b className="text-violet-300">
+                      {state.bid.count}×{state.bid.face}
+                    </b>{' '}
+                    · e.g.{' '}
+                    {state.bid.face < 6
+                      ? `${state.bid.count}×${state.bid.face + 1}`
+                      : `${state.bid.count + 1}×1`}{' '}
+                    / {state.bid.count + 1}×any
+                  </span>
+                </div>
+              )}
+
+              {/* face picker — illegal faces at the current count are locked */}
               <div className="flex items-center justify-center gap-1.5">
-                {[1, 2, 3, 4, 5, 6].map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setDraftFace(f)}
-                    className={`rounded-xl p-1 transition active:scale-90 ${
-                      draftFace === f ? 'bg-violet-400/25 ring-2 ring-violet-400' : 'bg-white/5'
-                    }`}
-                  >
-                    <Die face={f} size={26} />
-                  </button>
-                ))}
+                {[1, 2, 3, 4, 5, 6].map((f) => {
+                  const ok = faceLegal(f);
+                  return (
+                    <button
+                      key={f}
+                      disabled={!ok}
+                      onClick={() => setDraftFace(f)}
+                      className={`rounded-xl p-1 transition active:scale-90 ${
+                        draftFace === f && ok
+                          ? 'bg-violet-400/25 ring-2 ring-violet-400'
+                          : 'bg-white/5'
+                      } ${ok ? '' : 'cursor-not-allowed opacity-25'}`}
+                    >
+                      <Die face={f} size={26} />
+                    </button>
+                  );
+                })}
               </div>
 
-              {/* count stepper + actions */}
+              {/* count stepper + actions — stepper floors at the legal minimum */}
               <div className="mt-3 flex items-center gap-2">
                 <div className="flex flex-1 items-center justify-between rounded-full bg-white/10 px-2 py-1.5">
                   <button
-                    onClick={() => setDraftCount((c) => Math.max(1, c - 1))}
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 font-bold active:scale-90"
+                    onClick={() => setDraftCount((c) => Math.max(minCount, c - 1))}
+                    disabled={draftCount <= minCount}
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 font-bold active:scale-90 disabled:opacity-30"
                   >
                     −
                   </button>
@@ -450,11 +496,6 @@ export function LiarsDiceGame({ players, me, onExit, onStatus }: Props) {
                   </button>
                 )}
               </div>
-              {!legalBid(draftCount, draftFace) && state.bid && (
-                <p className="mt-1.5 text-center text-micro text-white/40">
-                  Bid must beat {state.bid.count}× {state.bid.face}
-                </p>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
