@@ -241,22 +241,26 @@ export function LiarsDiceGame({ players, me, onExit, onStatus }: Props) {
 
   const callLie = () => dispatch({ type: 'CALL' });
 
-  /** Push seat status up — the top strip renders dots/bubbles/turn ring */
+  /** Push seat status up — the top strip renders dots/bubbles/turn ring.
+   *  Deps must stay [state, onStatus]: deriving the turn id inside keeps
+   *  object identity stable, else every parent re-render re-fires this
+   *  effect and setState loops forever. */
   useEffect(() => {
     if (!onStatus) return;
+    const turnId = state.phase === 'bidding' ? state.seats[state.turn]?.id : undefined;
     const map = new Map<PlayerId, PlayerGameStatus>();
     for (const seat of state.seats) {
       const bubble = state.lastBy[seat.id];
       map.set(seat.id, {
         diceLeft: seat.dice.length,
         totalDice: START_DICE,
-        isTurn: state.phase === 'bidding' && seat.id === currentSeat?.seat.id,
+        isTurn: seat.id === turnId,
         bubble: bubble ? { text: bubble.text, kind: bubble.kind } : undefined,
         isLoser: state.phase === 'reveal' && state.reveal?.loserId === seat.id,
       });
     }
     onStatus(map);
-  }, [state, currentSeat, onStatus]);
+  }, [state, onStatus]);
 
   useEffect(() => () => onStatus?.(null), [onStatus]);
 
