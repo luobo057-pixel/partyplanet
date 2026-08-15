@@ -136,6 +136,14 @@ export const GAME_TYPE_LABELS: Record<GameType, string> = {
   none: 'Chat Only',
 };
 
+/** Game type → illustration asset (256px, from public/assets/pico) */
+export const GAME_TYPE_IMAGES: Record<GameType, string> = {
+  'truth-or-dare': '/assets/pico/game-draw.png',
+  quiz: '/assets/pico/game-mic.png',
+  'who-is-spy': '/assets/pico/game-spy.png',
+  none: '/assets/pico/gift-star-mic.png',
+};
+
 /** Vibe → style class */
 export const VIBE_STYLES: Record<RoomVibe, string> = {
   hot: 'bg-brand-500/20 text-brand-300',

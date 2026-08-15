@@ -6,11 +6,11 @@ import { Icon } from '@/shared/components/Icon';
 import {
   getMockRooms,
   GAME_TYPE_LABELS,
+  GAME_TYPE_IMAGES,
   VIBE_STYLES,
   VIBE_LABELS,
   type RoomWithHost,
 } from '@/services/mocks/roomData';
-import { GameTileIcon } from './GameTileIcon';
 import type { GameType } from '@/types';
 
 /**
@@ -106,9 +106,16 @@ function RoomCard({ room, onClick }: { room: RoomWithHost; onClick: () => void }
       onClick={onClick}
       className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl border border-white/5 bg-night-800 p-3 text-left transition active:scale-[0.98]"
     >
-      {/* Game tile icon */}
-      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-white/10 to-transparent">
-        <GameTileIcon gameType={room.gameType} size={40} />
+      {/* Game illustration (square art fills the tile) */}
+      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
+        <img
+          src={GAME_TYPE_IMAGES[room.gameType]}
+          alt={GAME_TYPE_LABELS[room.gameType]}
+          width={64}
+          height={64}
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
         {room.isPlaying && (
           <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-brand-500 px-1.5 py-0.5 text-micro font-bold leading-none">
             LIVE
