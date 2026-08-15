@@ -7,6 +7,7 @@ import { randomDialogue } from '@/services/mocks/npcDialogue';
 import type { NpcProfile } from '@/services/mocks/npcData';
 import { PlayerStrip } from './PlayerStrip';
 import { GameStage } from './GameStage';
+import { TruthOrDareGame } from './games/TruthOrDareGame';
 import { ChatOverlay, ChatInputBar } from './ChatOverlay';
 import { GiftPanel } from './GiftPanel';
 import { GiftFx, type GiftEffect } from './GiftFx';
@@ -237,21 +238,30 @@ export default function RoomPage() {
 
       {/* Game stage + chat overlay */}
       <div className="relative flex flex-1 flex-col overflow-hidden">
-        <GameStage
-          gameType={room.gameType}
-          isPlaying={room.isPlaying}
-          roomName={room.name}
-          isHost={isHost}
-          // While idle the stage (incl. Start Game) stays put — NPC chatter
-          // must never play whack-a-mole with the host's button.
-          // Once playing, speech takes the stage.
-          active={!room.isPlaying || speakingPlayerId === null}
-          onStartGame={() => setPlaying(true)}
-        />
+        {room.isPlaying && room.gameType === 'truth-or-dare' ? (
+          <TruthOrDareGame
+            players={room.players}
+            me={currentPlayer}
+            onExit={() => setPlaying(false)}
+          />
+        ) : (
+          <GameStage
+            gameType={room.gameType}
+            isPlaying={room.isPlaying}
+            roomName={room.name}
+            isHost={isHost}
+            // While idle the stage (incl. Start Game) stays put — NPC chatter
+            // must never play whack-a-mole with the host's button.
+            // Once playing, speech takes the stage.
+            active={!room.isPlaying || speakingPlayerId === null}
+            onStartGame={() => setPlaying(true)}
+          />
+        )}
         <ChatOverlay
           messages={messages}
           playersById={playersById}
           currentUserId={currentPlayer?.id ?? null}
+          compact={room.isPlaying}
         />
       </div>
 

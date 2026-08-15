@@ -19,16 +19,22 @@ interface ChatOverlayProps {
   messages: ChatMessage[];
   playersById: Map<PlayerId, Player>;
   currentUserId: PlayerId | null;
+  /** While a game runs, show fewer bubbles so the game owns the stage */
+  compact?: boolean;
 }
 
 /** Max chat input length — guards bubble layout from pastes */
 export const MAX_CHAT_LEN = 200;
 
-export function ChatOverlay({ messages, playersById, currentUserId }: ChatOverlayProps) {
-  const recent = messages.slice(-6);
+export function ChatOverlay({ messages, playersById, currentUserId, compact }: ChatOverlayProps) {
+  const recent = messages.slice(compact ? -2 : -6);
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end gap-1.5 px-4 pb-3">
+    <div
+      className={`pointer-events-none absolute inset-x-0 bottom-0 flex flex-col justify-end gap-1.5 px-4 pb-3 ${
+        compact ? 'opacity-80' : ''
+      }`}
+    >
       <AnimatePresence initial={false}>
         {recent.map((msg) => {
           const sender = playersById.get(msg.senderId);
