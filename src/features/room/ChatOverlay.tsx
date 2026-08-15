@@ -5,15 +5,14 @@ import { SimpleAvatar } from '@/shared/components/SimpleAvatar';
 import { Icon } from '@/shared/components/Icon';
 
 /**
- * 聊天浮层
+ * Chat overlay — translucent bubbles over the lower half of the game stage.
  *
- * 游戏中心型布局下的聊天呈现方式：
- * - 消息以半透明气泡叠在游戏舞台的下半部分
- * - 只显示最近几条（历史消息向上淡出）
- * - 自己的消息右对齐（品牌色），他人左对齐
- * - 不阻挡游戏画面顶部的主视觉
- *
- * 这样既保留了"热闹房间"的聊天氛围，又不喧宾夺主。
+ * UX rules:
+ * - Last 6 messages, entrance slide only (no `layout` — list reflow on rapid
+ *   add/remove caused visible jitter)
+ * - Text clamped to 3 lines (long pastes can't flood the stage)
+ * - Emoji-only messages render large (emotion-first, WeChat style)
+ * - Messages older than a minute show a light relative timestamp
  */
 
 interface ChatOverlayProps {
@@ -22,8 +21,10 @@ interface ChatOverlayProps {
   currentUserId: PlayerId | null;
 }
 
+/** Max chat input length — guards bubble layout from pastes */
+export const MAX_CHAT_LEN = 200;
+
 export function ChatOverlay({ messages, playersById, currentUserId }: ChatOverlayProps) {
-  // 只显示最近的 6 条，避免堆积遮挡
   const recent = messages.slice(-6);
 
   return (
@@ -32,10 +33,12 @@ export function ChatOverlay({ messages, playersById, currentUserId }: ChatOverla
         {recent.map((msg) => {
           const sender = playersById.get(msg.senderId);
           const isMe = msg.senderId === currentUserId;
+          const big = isEmojiOnly(msg.text);
+          const time = relTime(msg.createdAt);
+
           return (
             <motion.div
               key={msg.id}
-              layout
               initial={{ opacity: 0, y: 8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0 }}
@@ -51,18 +54,24 @@ export function ChatOverlay({ messages, playersById, currentUserId }: ChatOverla
                 />
               )}
               <div
-                className={`max-w-[70%] rounded-2xl px-3 py-1.5 text-sm backdrop-blur-sm ${
-                  isMe
-                    ? 'bg-brand-500/90 text-white'
-                    : 'bg-night-700/80 text-white/90'
-                }`}
+                className={`max-w-[70%] rounded-2xl px-3 py-1.5 backdrop-blur-sm ${
+                  isMe ? 'bg-brand-500/90 text-white' : 'bg-night-700/80 text-white/90'
+                } ${big ? 'px-3.5 py-2' : ''}`}
               >
                 {!isMe && sender && (
                   <p className="mb-0.5 text-micro font-medium text-white/40">
                     {sender.nickname}
+                    {time && <span className="ml-1 text-white/20">{time}</span>}
                   </p>
                 )}
-                <p className="leading-snug">{msg.text}</p>
+                {big ? (
+                  <p className="text-[28px] leading-normal">{msg.text}</p>
+                ) : (
+                  <p className="break-words line-clamp-3 text-sm leading-snug">{msg.text}</p>
+                )}
+                {isMe && time && (
+                  <p className="mt-0.5 text-right text-micro text-white/40">{time}</p>
+                )}
               </div>
             </motion.div>
           );
@@ -73,14 +82,13 @@ export function ChatOverlay({ messages, playersById, currentUserId }: ChatOverla
 }
 
 /**
- * 底部输入栏
- * 点击后弹出完整输入（MVP 用原生 input 直接打字）
+ * Bottom input bar.
  */
 interface ChatInputBarProps {
   value: string;
   onChange: (v: string) => void;
   onSend: () => void;
-  /** 快捷表情点击 */
+  /** Quick emoji tap — sends immediately */
   onEmoji?: (emoji: string) => void;
 }
 
@@ -99,7 +107,7 @@ export function ChatInputBar({ value, onChange, onSend, onEmoji }: ChatInputBarP
 
   return (
     <div className="border-t border-white/10 bg-night-800/95 px-3 py-2 backdrop-blur">
-      {/* 快捷表情行 */}
+      {/* Quick emoji row — tap to send instantly */}
       <div className="no-scrollbar mb-1.5 flex gap-1 overflow-x-auto">
         {QUICK_EMOJIS.map((emoji) => (
           <button
@@ -116,6 +124,7 @@ export function ChatInputBar({ value, onChange, onSend, onEmoji }: ChatInputBarP
         <input
           ref={inputRef}
           value={value}
+          maxLength={MAX_CHAT_LEN}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSend();
@@ -133,4 +142,17 @@ export function ChatInputBar({ value, onChange, onSend, onEmoji }: ChatInputBarP
       </div>
     </div>
   );
+}
+
+/** Emoji-only message? (extended pictographic + variation/joiner runs) */
+function isEmojiOnly(text: string): boolean {
+  return text.length <= 8 && /^[\p{Extended_Pictographic}\uFE0F\u200D]+$/u.test(text);
+}
+
+/** Relative timestamp — only surfaces after the first minute */
+function relTime(ts: number): string {
+  const diff = Date.now() - ts;
+  if (diff < 60_000) return '';
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m`;
+  return `${Math.floor(diff / 3_600_000)}h`;
 }

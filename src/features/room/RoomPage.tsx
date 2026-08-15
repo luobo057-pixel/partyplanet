@@ -140,6 +140,13 @@ export default function RoomPage() {
   const isHost = currentPlayer ? room.hostId === currentPlayer.id : false;
   const shownCount = Math.min(room.displayCount ?? room.players.length, room.maxPlayers);
 
+  /** Highlight my own avatar briefly after I send anything */
+  const highlightMe = () => {
+    if (!currentPlayer) return;
+    setSpeaking(currentPlayer.id);
+    trackTimeout(() => setSpeaking(null), 1500);
+  };
+
   const handleSend = () => {
     if (!draft.trim() || !currentPlayer || !room) return;
     addMessage({
@@ -150,8 +157,7 @@ export default function RoomPage() {
       createdAt: Date.now(),
     });
     setDraft('');
-    setSpeaking(currentPlayer.id);
-    trackTimeout(() => setSpeaking(null), 1500);
+    highlightMe();
   };
 
   const handleEmoji = (emoji: string) => {
@@ -163,6 +169,7 @@ export default function RoomPage() {
       text: emoji,
       createdAt: Date.now(),
     });
+    highlightMe();
   };
 
   const handleLeave = () => {
@@ -209,7 +216,10 @@ export default function RoomPage() {
           isPlaying={room.isPlaying}
           roomName={room.name}
           isHost={isHost}
-          active={speakingPlayerId === null}
+          // While idle the stage (incl. Start Game) stays put — NPC chatter
+          // must never play whack-a-mole with the host's button.
+          // Once playing, speech takes the stage.
+          active={!room.isPlaying || speakingPlayerId === null}
           onStartGame={() => setPlaying(true)}
         />
         <ChatOverlay
